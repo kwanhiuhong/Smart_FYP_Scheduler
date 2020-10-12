@@ -6,3 +6,8 @@ body {
 .col{
   text-align: center; 
 }
+
+.table-responsive {
+  height: 500px;
+  overflow-y: auto;
+}

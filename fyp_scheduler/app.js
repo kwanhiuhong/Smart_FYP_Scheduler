@@ -13,6 +13,7 @@ var db = monk('localhost:27017/fyp_sheduler');
 // var indexRouter = require('./routes/index');
 var backendRouter = require('./routes/backend.js');
 var loginRouter = require('./routes/login_backend.js')
+var adminRouter = require('./routes/admin_backend.js')
 
 var app = express();
 
@@ -24,18 +25,19 @@ app.use(function(req,res,next){
 
 app.use(logger('dev'));
 
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: false }));
-// app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', backendRouter);
-app.use('/', loginRouter);
 
 app.use(session({
   secret: 'keyboard cat'
 }))
+
+app.use('/', backendRouter);
+app.use('/', loginRouter);
+app.use('/', adminRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
