@@ -7,7 +7,7 @@ main_app.controller('fyp_scheduler_controller', function($scope, $http){
             if(response.data === ""){
                 alert("Error for getting login");
             }else{
-                alert(response.data);
+                // alert(response.data);
             }
         });
     }

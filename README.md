@@ -8,13 +8,19 @@ Then call mongo to start manipulate the mongo db
 /Users/hiuhongkwan/Documents/Developer_Tools/MongoDB_4.4.1/mongodb-macos-x86_64-4.4.1/bin/mongo
  
  Some common MongoDB commands in terminal:
+ ### Databases
  1. type "show dbs" to display all databases you have
  2. type "use fyp_sheduler" to create a db or use that db
- 3. type "show collections" you get what collections you have
- 4. type "db.userCollection.find()" show all details about the user collection.
- 5. type "db.dropDatabase()" to drop the database
- 6. type "db.createCollection(name, options)" to create a collection
- 7. type "db.COLLECTION_NAME.drop()" to drop a collection
+ 3. type "db.dropDatabase()" to drop the database
+ 
+ ### Collections
+ 1. type "show collections" you get what collections you have
+ 2. type "db.userCollection.find()" show all details about the user collection.
+ 3. type "db.createCollection(name, options)" to create a collection
+ 4. type "db.COLLECTION_NAME.drop()" to drop a collection
+ 5. type "db.collection_name.insert({'key':'value', 'key':'value'})" to insert a record in a collection
+ 6. type "db.collection_name.remove({})" to remove all records in a collection
+ 7. type "db.collection_name.remove({"key":"value"})" to remove certain records in a collection
  
 then start the web app using "npm start"
 

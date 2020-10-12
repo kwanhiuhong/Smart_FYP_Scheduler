@@ -16,12 +16,32 @@
 
     </head>
 
-    <body ng-app="fyp_scheduler" ng-controller="fyp_scheduler_controller" ng-init="">
-        <h1>Hello, world!</h1>
-        <button type="button" class="btn btn-outline-secondary" ng-click="backend()">Testing backend</button>
-        <button type="button" class="btn btn-outline-secondary" ng-click="login()">Testing login</button>
-
-    
+    <body ng-app="fyp_scheduler" ng-controller="fyp_scheduler_controller">
+        <div class="jumbotron d-flex align-items-center min-vh-100">
+            <div class="container" style="width: 60%;">
+                <div class="row">
+                    <div class="col">
+                        <img src="/images/main_page_logo.png" class="img-fluid" alt="Responsive image">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <form>
+                            <div class="form-group">
+                              <label for="login_username">Username or Group Number</label>
+                              <input type="text" class="form-control" id="login_username">
+                              <small class="form-text text-muted">Note that username is usually for page admin, whereas group number for students/supervisors</small>
+                            </div>
+                            <div class="form-group">
+                              <label for="login_password">Password</label>
+                              <input type="password" class="form-control" id="login_password">
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="login_submit">Submit</button>
+                          </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
 
 
