@@ -29,25 +29,18 @@
                         <form>
                             <div class="form-group">
                               <label for="login_username">Username or Group Number</label>
-                              <input type="text" class="form-control" id="login_username">
+                              <input type="text" class="form-control" ng-model="login_name">
                               <small class="form-text text-muted">Note that username is usually for page admin, whereas group number for students/supervisors</small>
                             </div>
                             <div class="form-group">
                               <label for="login_password">Password</label>
-                              <input type="password" class="form-control" id="login_password">
+                              <input type="password" class="form-control" ng-model="login_password">
                             </div>
-                            <button type="submit" class="btn btn-primary" id="login_submit">Submit</button>
+                            <button type="submit" class="btn btn-primary" ng-click="login()">Log In</button>
                           </form>
                     </div>
                 </div>
             </div>
         </div>
     </body>
-
-
-
-
-
-
-
 </html>
