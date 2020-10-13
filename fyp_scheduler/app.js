@@ -8,12 +8,12 @@ var logger = require('morgan');
 // Database
 var mongo = require('mongodb');
 var monk = require('monk');
-var db = monk('localhost:27017/fyp_sheduler');
+var db = monk('localhost:27017/fyp_scheduler');
 
 // var indexRouter = require('./routes/index');
-var backendRouter = require('./routes/backend.js');
-var loginRouter = require('./routes/login_backend.js')
-var adminRouter = require('./routes/admin_backend.js')
+var backendRouter = require('./backend/backend.js');
+var loginRouter = require('./backend/login_backend.js')
+var adminRouter = require('./backend/admin_backend.js')
 
 var app = express();
 

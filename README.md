@@ -49,3 +49,8 @@ NodeJS version: v12.18.4
 AugularJS: 1.8.0
 (https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.min.js)
 ExpressJS: 4.16.1
+
+Some Dependencies:
+1. We need file saver to export the excel file 
+npm install file-saver --save
+
