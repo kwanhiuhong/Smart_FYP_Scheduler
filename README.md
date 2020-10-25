@@ -15,7 +15,7 @@ Then call mongo to start manipulate the mongo db
  
  ### Collections
  1. type "show collections" you get what collections you have
- 2. type "db.userCollection.find()" show all details about the user collection.
+ 2. type "db.User.find()" show all details about the user collection.
  3. type "db.createCollection(name, options)" to create a collection
  4. type "db.COLLECTION_NAME.drop()" to drop a collection
  5. type "db.collection_name.insert({'key':'value', 'key':'value'})" to insert a record in a collection

@@ -3,8 +3,8 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 
 router.get('/checkLogin', function(req, res, next) {
-  if(req.session.username){
-    res.send(req.session.username);
+  if(req.session.userInfo){
+    res.send(req.session.userInfo);
   } else {
     res.send("");
   }
@@ -27,141 +27,151 @@ router.get('/getData', function(req, res, next){
 });
 
 router.put('/importData', bodyParser.json(), function(req, res, next){
-  //this is a object of objects
-  var data = req.body;
+  if(!req.session.userInfo){
+    res.send("No login session found");
+  } else if (req.session.userInfo["type"] != "admin") {
+    res.send("You are not an admin!");
+  } else {
+      //this is a object of objects
+    var data = req.body;
 
-  //an array of map object
-  let mapObjArray = [];
+    //an array of map object
+    let mapObjArray = [];
 
-  //an array of plain object
-  let objArray = [];
+    //an array of plain object
+    let objArray = [];
 
-  //an array of object storing each group's supervisor's and student's pw
-  let passwordObjArray = [];
+    //an array of object storing each group's supervisor's and student's pw
+    let passwordObjArray = [];
 
-  //get the largest group no currently in the database
-  let db = req.db;
-  let groupInfo = db.get("GroupInfo");
-  
-  groupInfo.find({},{"sort":"Group No"},function(error, records){
-    let length = records.length;
-    let maxGroupNo = -1;
+    //get the largest group no currently in the database
+    let db = req.db;
+    let groupInfo = db.get("GroupInfo");
+    
+    groupInfo.find({},{"sort":"Group No"},function(error, records){
+      let length = records.length;
+      let maxGroupNo = -1;
 
-    if (length > 0){
-      maxGroupNo = parseInt(records[length-1]["Group No"]);
-    } 
+      if (length > 0){
+        maxGroupNo = parseInt(records[length-1]["Group No"]);
+      } 
 
-    console.log("the max group no is "+maxGroupNo);
-    let groupNo = maxGroupNo === -1 ? 1 : maxGroupNo + 1;
+      console.log("the max group no is "+maxGroupNo);
+      let groupNo = maxGroupNo === -1 ? 1 : maxGroupNo + 1;
 
-    //now add three colums, Group No, Supervisor's pw, student's pw into the JSON
-    for (const [index, eachRow] of Object.entries(data)) {
-      let fyp_team = new Map([['Group No', groupNo++]]);
-      let passwords = new Map([
-          ['Supervisor\'s password', genRandomPassword()], 
-          ['Student\'s password', genRandomPassword()]
-      ]);
-      let raw_data = new Map(Object.entries(eachRow));
-      let map = new Map([...fyp_team, ...raw_data, ...passwords]);
-      mapObjArray.push(map);
-    }
-
-    //now convert it back to an array of plain object/JSON form
-    for (let i = 0; i < mapObjArray.length; i++){
-      let obj = {};
-      let supervisorPwObj = {};
-      let studentPwObj = {};
-
-      for (let [key, value] of mapObjArray[i]) {
-        if (key == 'Group No'){
-          supervisorPwObj['username'] = value;
-          studentPwObj['username'] = value;
-        } else if (key == 'Supervisor\'s password'){
-          supervisorPwObj['password'] = value;
-          supervisorPwObj['type'] = "supervisor";
-        } else if (key == 'Student\'s password'){
-          studentPwObj['password'] = value;
-          studentPwObj['type'] = "student";
-        }
-        obj[key] = value;
+      //now add three colums, Group No, Supervisor's pw, student's pw into the JSON
+      for (const [index, eachRow] of Object.entries(data)) {
+        let fyp_team = new Map([['Group No', groupNo++]]);
+        let passwords = new Map([
+            ['Supervisor\'s password', genRandomPassword()], 
+            ['Student\'s password', genRandomPassword()]
+        ]);
+        let raw_data = new Map(Object.entries(eachRow));
+        let map = new Map([...fyp_team, ...raw_data, ...passwords]);
+        mapObjArray.push(map);
       }
 
-      passwordObjArray.push(supervisorPwObj);
-      passwordObjArray.push(studentPwObj);
-      objArray.push(obj);
-    }
+      //now convert it back to an array of plain object/JSON form
+      for (let i = 0; i < mapObjArray.length; i++){
+        let obj = {};
+        let supervisorPwObj = {};
+        let studentPwObj = {};
 
-    //insert group info record into the GroupInfo collection
-    var group_info_collection = db.get("GroupInfo");
-    group_info_collection.insert(objArray, function(error){
-      if(error == null){
-        console.log("Successfully inserted records into GroupInfo");
-
-        //insert passwordObjArray into the User collection
-        var user_collection = db.get("User");
-        user_collection.insert(passwordObjArray, function(error){
-          if(error == null){
-            console.log("Successfully inserted records into User");
-            res.send(null);
-          }  else {
-            res.send(error);
+        for (let [key, value] of mapObjArray[i]) {
+          if (key == 'Group No'){
+            supervisorPwObj['username'] = value.toString();
+            studentPwObj['username'] = value.toString();
+          } else if (key == 'Supervisor\'s password'){
+            supervisorPwObj['password'] = value;
+            supervisorPwObj['type'] = "supervisor";
+          } else if (key == 'Student\'s password'){
+            studentPwObj['password'] = value;
+            studentPwObj['type'] = "student";
           }
-        });
+          obj[key] = value;
+        }
 
-      } else {
-        res.send(error);
+        passwordObjArray.push(supervisorPwObj);
+        passwordObjArray.push(studentPwObj);
+        objArray.push(obj);
       }
-    });
-  });
 
-
-});
-
-router.delete('/clearData', function(req, res, next){
-  let db = req.db;
-  //removed all records in GroupInfo
-  var group_info_collection = db.get("GroupInfo");
-  group_info_collection.remove({}, function(error){
-    if(error == null){
-      console.log("Successfully removed records in GroupInfo");
-    } else {
-      res.send(error);
-    }
-  });
-
-  //remove all records in User
-  var user_collection = db.get("User");
-  user_collection.remove({}, function(error){
-    if(error == null){
-      console.log("Successfully removed records in User");
-
-      //add back admin record into the User collection
-      user_collection.insert({"username":"admin", "password":"admin", "type":"admin"}, function(error){
+      //insert group info record into the GroupInfo collection
+      let group_info_collection = db.get("GroupInfo");
+      group_info_collection.insert(objArray, function(error){
         if(error == null){
-          console.log("Successfully inserted admin back to User");
-          res.send(null);
+          console.log("Successfully inserted records into GroupInfo");
+
+          //insert passwordObjArray into the User collection
+          let user_collection = db.get("User");
+          user_collection.insert(passwordObjArray, function(error){
+            if(error == null){
+              console.log("Successfully inserted records into User");
+              res.send("Success");
+            }  else {
+              res.send(error);
+            }
+          });
+
         } else {
           res.send(error);
         }
       });
-    } else {
-      res.send(error);
-    }
-  });
+    });
+  }
+});
 
+router.delete('/clearData', function(req, res, next){
+  //if not admin, not allowed to clear data
+  if(!req.session.userInfo){
+    res.send("No login session found");
+  } else if (req.session.userInfo["type"] != "admin") {
+    res.send("You are not an admin!");
+  } else {
+    let db = req.db;
+    //removed all records in GroupInfo
+    let group_info_collection = db.get("GroupInfo");
+    group_info_collection.remove({}, function(error){
+      if(error == null){
+        console.log("Successfully removed records in GroupInfo");
+      } else {
+        res.send(error);
+      }
+    });
+  
+    //remove all records in User
+    let user_collection = db.get("User");
+    user_collection.remove({}, function(error){
+      if(error == null){
+        console.log("Successfully removed records in User");
+  
+        //add back admin record into the User collection
+        user_collection.insert({"username":"admin", "password":"admin", "type":"admin"}, function(error){
+          if(error == null){
+            console.log("Successfully inserted admin back to User");
+            res.send("Success");
+          } else {
+            res.send(error);
+          }
+        });
+      } else {
+        res.send(error);
+      }
+    });
+  }
 });
 
 //helper functions
 function genRandomPassword(){
-  let numberOfDigits = 8;
-  let multiplier = 1;
-  for(let cnt = 1; cnt < numberOfDigits; cnt++){
-      multiplier *= 10;
-  }
-  let randPW = Math.floor(Math.random() * multiplier);
-  while(randPW < multiplier){
-      randPW *= 10;
-  }
+  let randPW = ''; 
+  let str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +  
+          'abcdefghijklmnopqrstuvwxyz0123456789@#$'; 
+    
+  for (i = 1; i <= 8; i++) { 
+      let char = Math.floor(Math.random() * str.length + 1);
+      randPW += str.charAt(char) 
+  } 
+    
   return randPW;
 }
 

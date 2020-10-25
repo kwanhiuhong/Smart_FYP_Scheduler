@@ -22,4 +22,3 @@ main_app.controller('fyp_scheduler_controller', function($scope, $http){
         }
     }
 });
-

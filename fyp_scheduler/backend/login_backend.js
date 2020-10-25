@@ -8,18 +8,26 @@ router.get('/login', function(req, res, next) {
   let db = req.db;
   let login_info = db.get("User");
 
-  login_info.find({}, function(error, user){
-
+  login_info.find({"username":username}, function(error, user){
+    console.log(user);
     if (error === null){
       if(user.length === 0){
-        req.session.username = undefined;
+        req.session.userInfo = undefined;
         res.send("");
-      } else if (user[0].password != password) {
-        req.session.username = undefined;
-        res.send("Incorrect password");
       } else {
-        req.session.username = user[0].username;
-        res.send(true);
+        let passwordRight = false;
+        for(let i = 0; i < user.length; ++i){
+          if (user[i].password == password) {
+            passwordRight = true;
+            req.session.userInfo = {"username":user[i].username, "type":user[i].type};
+            res.send(true);
+            break;
+          }
+        }
+        if(!passwordRight){
+          req.session.userInfo = undefined;
+          res.send("Incorrect password");
+        }
       }
     } else{
       console.log("Some error occurs in login function, see: " + error);

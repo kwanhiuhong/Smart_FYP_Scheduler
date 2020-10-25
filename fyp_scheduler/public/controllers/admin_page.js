@@ -8,6 +8,7 @@ var main_app = angular.module('admin_page', ['ngFileUpload']).filter('fromMap', 
 
 main_app.controller('admin_page_controller', function($scope, $http){
 
+    $scope.show_table = false;
     $scope.show_no_login = false;
     $scope.show_no_data = false;
 
@@ -37,6 +38,7 @@ main_app.controller('admin_page_controller', function($scope, $http){
                 $scope.show_no_data = false;
                 $scope.headers = headers;
                 $scope.fyp_data = excelArrayObj;
+                $scope.show_table = true;
             } else {
                 $scope.show_no_data = true;
             }
@@ -93,26 +95,26 @@ main_app.controller('admin_page_controller', function($scope, $http){
 
         let excelJsonJson = {};
         for(let i = 1; i <= length; i++){
-            excelJsonJson[i] = excelArrayJson[i];
+            excelJsonJson[i] = excelArrayJson[i-1];
         }
 
         $http.put("/importData", excelJsonJson).then(function(response){
-            if (response.data){
-                alert(response.data);
-            } else {
+            if (response.data === "Success"){
                 alert("Successfully loaded data!");
                 window.location.reload();
+            } else {
+                alert("Fail to import data, errors: " + response.data);
             }
         });
     };
 
     $scope.clear_all_data = function(){
         $http.delete("/clearData").then(function(response){
-            if (response.data){
-                alert(response.data);
-            } else {
+            if (response.data === "Success"){
                 alert("Succeeded!");
                 window.location.reload();
+            } else {
+                alert("Fail to clear, errors: " + response.data);
             }
         });
     }
@@ -121,7 +123,6 @@ main_app.controller('admin_page_controller', function($scope, $http){
         var blob = new Blob([document.getElementById('exportable_table').innerHTML], {
             type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8",
         });
-        saveAs(blob, "Report.xls");
+        saveAs(blob, "GroupInfo.xls");
     };
 });
-
