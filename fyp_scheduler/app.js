@@ -11,7 +11,7 @@ var monk = require('monk');
 var db = monk('localhost:27017/fyp_scheduler');
 
 // var indexRouter = require('./routes/index');
-var backendRouter = require('./backend/backend.js');
+var backendRouter = require('./backend/scheduler_backend.js');
 var loginRouter = require('./backend/login_backend.js')
 var adminRouter = require('./backend/admin_backend.js')
 
