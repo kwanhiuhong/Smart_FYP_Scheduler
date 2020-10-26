@@ -55,6 +55,6 @@ Some Dependencies:
 https://fullcalendar.io/docs
 
 Some sample UIs:
-<img src="admin_page">
-<img src="login_page>
+<img src="https://github.com/kwanhiuhong/Smart_FYP_Scheduler/admin_page.png">
+<img src="https://github.com/kwanhiuhong/Smart_FYP_Scheduler/login_page.png">
 <img src="https://github.com/kwanhiuhong/Smart_FYP_Scheduler/scheduler_page.png">
