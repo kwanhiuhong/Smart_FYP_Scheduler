@@ -9,8 +9,10 @@ main_app.controller('scheduler_controller', function($scope, $http){
             allDaySlot: false,
             hiddenDays: [ 0, 6 ], // hide Sat and Sun
             slotDuration: '00:20:00',
+            slotMinTime: '09:00:00',
+            slotMaxTime: '19:00:00',
             initialDate: '2020-12-01',
-            
+
             headerToolbar: {
                 left: '',
                 center: 'title',
