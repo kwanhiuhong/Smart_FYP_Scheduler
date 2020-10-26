@@ -18,9 +18,10 @@ router.get('/login', function(req, res, next) {
         let passwordRight = false;
         for(let i = 0; i < user.length; ++i){
           if (user[i].password == password) {
+            let userInfo = {"username":user[i].username, "type":user[i].type};
             passwordRight = true;
-            req.session.userInfo = {"username":user[i].username, "type":user[i].type};
-            res.send(true);
+            req.session.userInfo = userInfo;
+            res.send(userInfo);
             break;
           }
         }

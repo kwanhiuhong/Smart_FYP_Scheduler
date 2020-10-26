@@ -52,4 +52,4 @@ ExpressJS: 4.16.1
 
 Some Dependencies:
 1. We need a calendar, please refer to the following links for docs, and installation details.
-https://fullcalendar.io/docs/getting-started
+https://fullcalendar.io/docs

@@ -15,8 +15,12 @@ main_app.controller('login_controller', function($scope, $http){
                     alert("Username/group no " + username + " could not be found in our record!");
                 } else if (response.data === "Incorrect password"){
                     alert("Incorrect password for username/groupno " + username + "!");
-                } else if (response.data === true){
-                    window.location.href = "/admin_page.html";  
+                } else if(response.data) {
+                    if (response.data.type === "admin"){
+                        window.location.href = "/admin_page.html";  
+                    } else {
+                        window.location.href = "/scheduler.html";  
+                    }
                 }
             });
         }

@@ -13,10 +13,9 @@
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 
+        <!-- calendar -->
         <link href='/fullcalendar/main.css' rel='stylesheet' />
         <script src='/fullcalendar/main.js'></script>
-        <script>
-        </script>
 
         <!-- angular -->
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.min.js"></script>
@@ -39,95 +38,111 @@
 
 
                     <div class="col" id="chatbox">
-                        
-                        
                         <div class="container">
-
-                            <!-- Grid row -->
-                            <div class="row">
-                          
-                              <!-- Grid column -->
-                              <div class="col">
-                          
-                                <div class="card chat-room small-chat wide" id="myForm" >
-                                  <div class="card-header white d-flex" id="toggle" style="cursor: pointer;">
-                                    <div class="heading d-flex justify-content-start">
-                                      <div class="profile-photo">
-                                        <img src="https://mdbootstrap.com/img/Photos/Avatars/avatar-6.jpg" alt="avatar" class="avatar rounded-circle mr-2 ml-0">
-                                        <span class="state"></span>
-                                      </div>
-                                      <div class="data">
-                                        <p class="name mb-0"><strong>John Smith</strong></p>
-                                        <p class="activity text-muted mb-0">Active now</p>
-                                      </div>
-                                    </div>
-                                    <div class="icons grey-text">
-                                      <a class="feature"><i class="fas fa-video mr-2"></i></a>
-                                      <a class="feature"><i class="fas fa-phone mr-2"></i></a>
-                                      <a class="feature"><i class="fas fa-cog mr-2"></i></a>
-                                      <a id="closeButton"><i class="fas fa-times mr-2"></i></a>
-                                    </div>
-                                  </div>
-                                  <div class="my-custom-scrollbar" id="message">
-                                    <div class="card-body p-3">
-                                      <div class="chat-message">
-                                        <div class="media mb-3">
-                                          <img class="d-flex rounded mr-2" src="https://mdbootstrap.com/img/Photos/Avatars/avatar-6.jpg" alt="Generic placeholder image">
-                                          <div class="media-body">
-                                            <p class="my-0">You're friends on Facebook</p>
-                                            <p class="mb-0 text-muted">Web Designer at MDBootstrap</p>
-                                            <p class="mb-0 text-muted">Lives in Paris</p>
-                                          </div>
-                                        </div>
-                                        <div class="card bg-primary rounded w-75 float-right z-depth-0 mb-1">
-                                          <div class="card-body p-2">
-                                            <p class="card-text text-white">Lorem ipsum dolor sit amet consectetur adipisicing elit voluptatem cum eum tempore.</p>
-                                          </div>
-                                        </div>
-                                        <div class="card bg-primary rounded w-50 float-right z-depth-0 mb-2">
-                                          <div class="card-body p-2">
-                                            <p class="card-text text-white">Rem suscipit lorum repellendus ditiis?</p>
-                                          </div>
-                                        </div>
-                                        <div class="card bg-light rounded w-75 z-depth-0 mb-1 message-text">
-                                          <div class="card-body p-2">
-                                            <p class="card-text black-text">Nostrum minima cupiditate assumenda, atque cumque hic voluptatibus at corporis maxime quam harum.</p>
-                                          </div>
-                                        </div>
-                                        <div class="d-flex justify-content-start">
-                                          <div class="profile-photo message-photo">
-                                            <img src="https://mdbootstrap.com/img/Photos/Avatars/avatar-6.jpg" alt="avatar" class="avatar rounded-circle mr-2 ml-0">
-                                            <span class="state"></span>
-                                          </div>
-                                          <div class="card bg-light rounded w-75 z-depth-0 mb-2">
-                                            <div class="card-body p-2">
-                                              <p class="card-text black-text">Qui animi molestiae autem nihil optio recusandae nisi sit ab quo est.</p>
+                            <div class="row chat-window col-xs-5 col-md-3" id="chat_window_1" style="margin-left:10px; max-width:100%">
+                                <div class="col-xs-12 col-md-12">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading top-bar">
+                                            <div class="col-md-8 col-xs-8">
+                                                <h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span>Command Box</h3>
                                             </div>
-                                          </div>
+                                            <div class="col-md-4 col-xs-4" style="text-align: right;">
+                                                <a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim"></span></a>
+                                                <a href="#"><span class="glyphicon glyphicon-remove icon_close" data-id="chat_window_1"></span></a>
+                                            </div>
                                         </div>
-                                        <div class="card bg-primary rounded w-75 float-right z-depth-0 mb-1 last">
-                                          <div class="card-body p-2">
-                                            <p class="card-text text-white">Maxime nostrum ut blanditiis a quod quam, quidem deleniti?</p>
-                                          </div>
+                                        <div class="panel-body msg_container_base" style="max-height: 400px; height:400px;">
+                                            <!-- <div class="row msg_container base_sent">
+                                                <div class="col-md-10 col-xs-10">
+                                                    <div class="messages msg_sent">
+                                                        <p>that mongodb thing looks good, huh?
+                                                        tiny master db, and huge document store</p>
+                                                        <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 col-xs-2 avatar">
+                                                    <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+                                                </div>
+                                            </div> -->
+                                            <div class="row msg_container base_receive">
+                                                <div class="col-md-2 col-xs-2 avatar">
+                                                    <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+                                                </div>
+                                                <div class="col-md-10 col-xs-10">
+                                                    <div class="messages msg_receive">
+                                                        <p>Welcome group 20 students! What would you like to do with this smart fyp scheduler?</p>
+                                                        <br>
+                                                        <p>1. Schedule a date (Please fill in the timeslot that you are not available)</p>
+                                                        <p>2. Reschedule a date (Cancel current date assigned and re-select unavailable slots)</p>
+                                                        <p>3. Exit</p>
+                                                        <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row msg_container base_sent">
+                                                <div class="col-xs-10 col-md-10">
+                                                    <div class="messages msg_sent">
+                                                        <p>1</p>
+                                                        <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 col-xs-2 avatar">
+                                                    <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+                                                </div>
+                                            </div>
+                                            <div class="row msg_container base_receive">
+                                                <div class="col-md-2 col-xs-2 avatar">
+                                                    <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+                                                </div>
+                                                <div class="col-xs-10 col-md-10">
+                                                    <div class="messages msg_receive">
+                                                        <p>Great! Please pick the slot that are not available to you on the left, and please input your name and the reasons that 
+                                                            you are unable to join this timeslot! Then type "Done".
+                                                        </p>
+                                                        <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row msg_container base_sent">
+                                                <div class="col-md-10 col-xs-10 ">
+                                                    <div class="messages msg_sent">
+                                                        <p>Done</p>
+                                                        <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 col-xs-2 avatar">
+                                                    <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+                                                </div>
+                                            </div>
                                         </div>
-                                      </div>
+                                        <div class="panel-footer">
+                                            <div class="input-group">
+                                                <input id="btn-input" type="text" class="form-control input-sm chat_input" placeholder="Write your message here..." />
+                                                <span class="input-group-btn">
+                                                <button class="btn btn-primary btn-sm" id="btn-chat">Send</button>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                  </div>
-                                  <div class="card-footer text-muted white pt-1 pb-2 px-3">
-                                    <input type="text" id="exampleForm2" class="form-control" placeholder="Type a message...">
-                                  </div>
                                 </div>
-                          
-                              </div>
-                              <!-- Grid column -->
-                          
                             </div>
-                            <!-- Grid row -->
-                          
-                          </div>
-
-
-
+                            
+                            <div class="btn-group dropup">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                    <span class="glyphicon glyphicon-cog"></span>
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="#" id="new_chat"><span class="glyphicon glyphicon-plus"></span> Novo</a></li>
+                                    <li><a href="#"><span class="glyphicon glyphicon-list"></span> Ver outras</a></li>
+                                    <li><a href="#"><span class="glyphicon glyphicon-remove"></span> Fechar Tudo</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="#"><span class="glyphicon glyphicon-eye-close"></span> Invisivel</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                    
                     </div>
                 </div>
             </div>
