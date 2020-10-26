@@ -51,6 +51,5 @@ AugularJS: 1.8.0
 ExpressJS: 4.16.1
 
 Some Dependencies:
-1. We need file saver to export the excel file 
-npm install file-saver --save
-
+1. We need a calendar, please refer to the following links for docs, and installation details.
+https://fullcalendar.io/docs/getting-started
