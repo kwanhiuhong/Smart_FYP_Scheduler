@@ -1,3 +1,0 @@
-1. Create session so that users need not login every time.
-
-2. Support signout function
