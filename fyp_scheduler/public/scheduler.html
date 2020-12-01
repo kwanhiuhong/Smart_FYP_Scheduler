@@ -22,7 +22,6 @@
 
         <!-- front end controller -->
         <script src="/controllers/scheduler_page.js"></script>
-
         <title>Smart FYP Scheduler</title>
     </head>
     <body ng-app="scheduler" ng-controller="scheduler_controller">
@@ -31,11 +30,39 @@
                 <div class="row" style="padding:10">
                     <a>Welcome Group!</a>
                 </div>
+
+                <!-- Modal -->
+                <button type="button" class="btn btn-primary" id="modalButton" data-toggle="modal" data-target="#exampleModal" style="display: none;">
+                    Launch demo modal
+                </button>
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="modalTitle">Title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body" id="modalBody">
+                            Body
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+
+                <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="hi">
+                    Tooltip on top
+                </button>
                 <div class="row">
                     <div class="col col-lg-7">
                         <div id='calendar'></div>
                     </div>
-
 
                     <div class="col" id="chatbox">
                         <div class="container">
@@ -74,7 +101,8 @@
                                                         <br>
                                                         <p>1. Schedule a date (Please fill in the timeslot that you are not available)</p>
                                                         <p>2. Reschedule a date (Cancel current date assigned and re-select unavailable slots)</p>
-                                                        <p>3. Exit</p>
+                                                        <p>3. Generate a date</p>
+                                                        <p>4. Exit</p>
                                                         <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
                                                     </div>
                                                 </div>
