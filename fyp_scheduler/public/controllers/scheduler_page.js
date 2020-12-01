@@ -83,27 +83,17 @@ main_app.controller('scheduler_controller', function($scope, $http){
 
     $scope.load = function(){
         $http.get("/fetchEvents").then(function(response){
-            if (response.data.length > 0){
+            let responseData = response.data;
+            if (Object.keys(responseData).length > 0){
                 let eventSources = [];
-                for(let i = 0; i < response.data.length; ++i){
-                    let eachEventObj = response.data[i];
-                    let startTime = parseInt(eachEventObj["startTime"]);
-                    let endTime = startTime + iosNumberForPresentTime;
-                    let content = "";
-                    let event;
-                    
-                    for(let j = 0; j < eachEventObj["records"].length; ++j){
-                        let eachRecord = eachEventObj["records"][j];
-                        let username = eachRecord["username"];
-                        let usertype = eachRecord["usertype"];
-                        let reason = eachRecord["reasons"];
-                        let isConfirmed = eachRecord["confirmed"];
-                        content += "Group " + username + "'s " + usertype + ": " + reason + "\n";
-                    }
 
-                    event = {title: content, start: startTime, end: endTime};
-                    eventSources.push(event);
-                }
+                let sameTypeEventSource = eventCreator(responseData["sameTypeSlots"], "Cyan", "black");
+                let differentTypesEventSource = eventCreator(responseData["differentTypesSlots"], "", "black");
+                let confirmedEventSource = eventCreator(responseData["confirmedSlot"], "green", "black");
+                let fullEventSource = eventCreator(responseData["fullSlots"], "grey", "black");
+
+                eventSources = [...sameTypeEventSource, ...differentTypesEventSource, ...confirmedEventSource, ...fullEventSource];
+                
                 calendar.addEventSource(eventSources);
             }
         });
@@ -111,7 +101,33 @@ main_app.controller('scheduler_controller', function($scope, $http){
     };
 });
 
+function eventCreator(timeslots, color, textColor){
+    let eventSources = [];
+    if (timeslots.length > 0){
 
+        for(let i = 0; i < timeslots.length; ++i){
+            let eachEventObj = timeslots[i];
+            let startTime = parseInt(eachEventObj["startTime"]);
+            let endTime = startTime + iosNumberForPresentTime;
+            let content = "";
+            let event = {};
+            
+            for(let j = 0; j < eachEventObj["records"].length; ++j){
+                let eachRecord = eachEventObj["records"][j];
+                let username = eachRecord["username"];
+                let usertype = eachRecord["usertype"];
+                let reason = eachRecord["reasons"];
+                let isConfirmed = eachRecord["confirmed"];
+                content += "Group " + username + "'s " + usertype + ": " + reason + "\n";
+            }
+
+            event = {title: content, start: startTime, end: endTime, 
+                color:color, textColor:textColor};
+            eventSources.push(event);
+        }
+    }
+    return eventSources;
+}
 //date string convertor
 // const unixTimeZero = Date.parse('Tue Dec 01 2020 14:40:00 GMT+0800 (Hong Kong Standard Time)');
 // const javaScriptRelease = Date.parse('Tue Dec 01 2020 15:00:00 GMT+0800 (Hong Kong Standard Time)');

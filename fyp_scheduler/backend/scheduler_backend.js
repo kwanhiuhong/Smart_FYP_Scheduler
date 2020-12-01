@@ -11,11 +11,51 @@ router.get('/fetchEvents', function(req, res, next) {
   } else {
     let db = req.db;
     let dbTimeCollection = db.get("PresentationTime");
+    let grpNo = req.session.userInfo["username"];
+    let usertype = req.session.userInfo["type"];
+
+    let returnedDate = {"sameTypeSlots":[], "differentTypesSlots":[], "confirmedSlot":[], "fullSlots":[]};
+
     dbTimeCollection.find({},function(error, timeslotRecords){
       if(error == null){
-        res.send(timeslotRecords);
+        for (let i = 0; i < timeslotRecords.length; ++i){
+          let hasSameType = false, hasDifferentType = false;
+          let eachTimeslotRecord = timeslotRecords[i];
+
+          let sameTypeSlot = {}, sameTypeRecords = [];
+          let differentTypesSlot = {}, differentTypesRecords = [];
+
+          let startTime = eachTimeslotRecord["startTime"];
+          let listOfRecords = eachTimeslotRecord["records"];
+
+          for(let j = 0; j < listOfRecords.length; ++j){
+            let eachRecord = listOfRecords[j];
+
+            if(eachRecord["username"] == grpNo){
+              if(eachRecord["usertype"] == usertype){
+                sameTypeRecords.push(eachRecord);
+                hasSameType = true;
+              } else if (eachRecord["usertype"] != usertype){
+                differentTypesRecords.push(eachRecord);
+                hasDifferentType = true;
+              }
+            }
+          }
+          
+          if(hasSameType){
+            sameTypeSlot["startTime"] = startTime;
+            sameTypeSlot["records"] = sameTypeRecords;
+            returnedDate["sameTypeSlots"].push(sameTypeSlot);
+          } else if (hasDifferentType){
+            differentTypesSlot["startTime"] = startTime;
+            differentTypesSlot["records"] = differentTypesRecords;
+            returnedDate["differentTypesSlots"].push(differentTypesSlot);
+          }
+        }
+
+        res.send(returnedDate);
       } else {
-        res.send([]);
+        res.send({});
       }
     });
   }
@@ -47,7 +87,8 @@ router.get('/insertEvent', function(req, res, next){
           }
         });
       } else {
-        let updatedRecords = timeslotRecords["records"].push(newRecord);
+        console.log(timeslotRecords);
+        let updatedRecords = timeslotRecords[0]["records"].push(newRecord);
         dbTimeCollection.update({'startTime': startTime}, {$set: {"records": updatedRecords}}, function(err){
           if(error == null){
             console.log("Successfully updated records in PresentationTime");
