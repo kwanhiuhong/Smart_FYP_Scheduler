@@ -25,7 +25,7 @@
         <title>Smart FYP Scheduler</title>
     </head>
     <body ng-app="scheduler" ng-controller="scheduler_controller">
-        <div class="jumbotron d-flex align-items-center min-vh-100" ng-init="load()">
+        <div class="jumbotron d-flex align-items-center min-vh-100" >
             <div class="container" style="max-width: 95%;">
                 <div class="row" style="padding:10">
                     <a>Welcome Group!</a>
@@ -61,7 +61,7 @@
                 </button>
 
                 <div class="row">
-                    <div class="col col-lg-7">
+                    <div class="col col-lg-7" ng-init="load()">
                         <div id='calendar'></div>
                     </div>
 

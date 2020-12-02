@@ -106,7 +106,8 @@ router.get('/insertEvent', function(req, res, next){
         });
       } else {
         console.log(timeslotRecords);
-        let updatedRecords = timeslotRecords[0]["records"].push(newRecord);
+        let updatedRecords = timeslotRecords[0]["records"];
+        updatedRecords.push(newRecord);
         dbUnavailableTime.update({'startTime': startTime}, {$set: {"records": updatedRecords}}, function(err){
           if(error == null){
             console.log("Successfully updated records in UnavailableTime");
@@ -126,9 +127,6 @@ router.put('/confirmATimeslot', bodyParser.json(), function(req, res, next){
   } else {
     let username = req.session.userInfo['username'];
     let schedulerConfigs = req.body;
-    console.log("Now printing scheduler configs");
-    console.log(schedulerConfigs);
-    console.log(typeof(schedulerConfigs.initDate));
 
     //retrieve all configs passed in
     let slotDuration = schedulerConfigs.maxPresentationTime;
@@ -156,39 +154,74 @@ router.put('/confirmATimeslot', bodyParser.json(), function(req, res, next){
               dayStartTime, dayEndTime, slotDuration, lunchHourStart, lunchHourEnd);
             
             let confirmedSlots = getConfirmedSlot(confirmedTimes, username);
-            let fullSlots = getFullSlots(confirmedSlots, maxNoOfGrpsInEachSlot);
-            let notFullSlots = getUnfullSlots(confirmedSlots, maxNoOfGrpsInEachSlot);
-            
+            let fullSlots = getFullSlots(confirmedTimes, maxNoOfGrpsInEachSlot);
+            let notFullSlots = getUnfullSlots(confirmedTimes, maxNoOfGrpsInEachSlot);
+
             if (confirmedSlots.length > 0){
               let confirmedTime = new Date (confirmedSlots[0]["startTime"]);
               res.send("Group " + username + " already has confirmed timeslot in " + confirmedTime + " !")
             } else {
-              let flattenedListNotFullSlots = flattenListOfObj(notFullSlots, "startTime");
-              console.log("Not full slots");
-              console.log(flattenedListNotFullSlots);
-              let availableSlots = removeFromList(allPossibleSlots, flattenedListNotFullSlots);
-              console.log(availableSlots.length);
-              for (let i = 0; i < availableSlots.length; ++i){
-                
-              }
-              //get not full and possible slots
-              //then traverse it with loop of unavailable time, if ok break the loop
-              //then use that timeslot
-              //update db
-            }
-            // let temp1 = getFullSlots(confirmedTimes, maxNoOfGrpsInEachSlot);
-            // let temp2 = getUnfullSlots(confirmedTimes, maxNoOfGrpsInEachSlot);
-            // let temp3 = getConfirmedSlot(confirmedTimes, username);
+             
+              let flattenedListFullSlots = flattenListOfObj(fullSlots, "startTime");
+              let availableSlots = removeFromList(allPossibleSlots, flattenedListFullSlots);
+              let unavailableSlots = getUnavailableSlots(unavailableTimes, username);
+              let unavailableSlotsList = flattenListOfObj(unavailableSlots, "startTime");
 
-            // console.log("temp1");
-            // console.log(temp1);
-            // console.log(temp1[0]["records"]);
-            // console.log(temp1[0]["records"][0]);
-            // console.log("temp2");
-            // console.log(temp2);
-            // console.log("temp3");
-            // console.log(temp3);
-            // console.log(flattenListOfObj(temp1, "startTime"));
+              let foundASlot = false;
+              for (let i = 0; i < availableSlots.length; ++i){
+                let eachTimeslot = availableSlots[i];
+                let goodSlot = true;
+                for (let j = 0; j < unavailableSlotsList.length; ++j){
+                  if (eachTimeslot == unavailableSlotsList[j]){
+                    goodSlot = false;
+                    break;
+                  }
+                }
+                if (goodSlot == true){
+                  foundASlot = true;
+                  //find this slot exists in notfull slots
+                  let inNotFullSlots = false;
+                  for (let k = 0; k < notFullSlots.length; ++k){
+                    let eachNotFullSlot = notFullSlots[k];
+                    if (eachNotFullSlot["startTime"] == eachTimeslot){
+                      let records = eachNotFullSlot["records"];
+                      records.push({"username": username, "confirmed": true});
+                      
+                      console.log("Before update");
+                      dbConfirmedTime.update({'startTime': eachTimeslot}, {$set: {"records": records}}, function(err){
+                        if(error == null){
+                          console.log("Successfully updated records in confirmedTime");
+                          res.send([{"startTime":eachTimeslot, "username": username}]);
+                        } else {
+                          res.send(error);
+                        }
+                      });
+                      inNotFullSlots = true;
+                      break;
+                    }
+                  }
+
+                  if (!inNotFullSlots){
+                    let obj = {'startTime': eachTimeslot, "records": [{"username": username, "confirmed": true}]};
+                    
+                    console.log("Before insert");
+                    dbConfirmedTime.insert(obj, function(err){
+                      if(error == null){
+                        console.log("Successfully inserted records in confirmedTime");
+                        res.send([{"startTime":eachTimeslot, "username": username}]);
+                      } else {
+                        res.send(error);
+                      }
+                    });
+                  }
+                  break;
+                }
+              }
+
+              if (!foundASlot){
+                res.send("Unable to find an appropriate slot!");
+              }
+            }
 
           } else {
             res.send(error);
@@ -198,14 +231,6 @@ router.put('/confirmATimeslot', bodyParser.json(), function(req, res, next){
         res.send(error);
       }
     })
-    //confirmed time structure similar to 
-    //step 1 goto confirmed time check if this group has confirmed time or not
-    //if no, generate the time slot that is allowed to choose
-    //this timeslot has a max limit of 2 confirmed slot, and 
-    //return an array containing the timeslot that is ok to choose
-    //step 2, which should be nested in step 1, goto unavailable time, for each in ok timeslot : 
-    //  for each in unavailable time: if unavailable time != oktimeslot -> done!
-    //step 3, which should be nested in step 2, go back to confirmed time and update the db
   }
 });
 
@@ -232,7 +257,7 @@ function genAllPossibleISOSlots(initialDate, totalLength, hiddenDays, startTime,
         if (dateTimeIso > lunchStartInIso - eachSlotInIso && dateTimeIso < lunchEndInIso){
           continue;
         } else {
-          allSlots.push(dateTimeIso);
+          allSlots.push(dateTimeIso.toString());
         }
       }
     }
@@ -245,6 +270,26 @@ function grpHasConfirmedSlot(){
   let hasConfirmedSlot = false;
 
   return hasConfirmedSlot;
+}
+
+function getUnavailableSlots(unavailableSlotsRecords, grpNo){
+  let unavailableSlots = []
+  for(let i = 0; i < unavailableSlotsRecords.length; ++i){    
+    let eachTimeslotRecord = unavailableSlotsRecords[i];
+    let timeSlotInIso = eachTimeslotRecord["startTime"];
+    let records = eachTimeslotRecord["records"];
+
+    for (let j = 0; j < records.length; ++j){
+      let eachRecord = records[j];
+      if (eachRecord["username"] == grpNo){
+        let obj = {}
+        obj["startTime"] = timeSlotInIso;
+        obj["records"] = [{"username": eachRecord["username"], "confirmed": false}];
+        unavailableSlots.push(obj);
+      }
+    }
+  }
+  return unavailableSlots
 }
 
 function getFullSlots(confirmedSlotsRecords, maxNoOfGrpsInEachSlot){

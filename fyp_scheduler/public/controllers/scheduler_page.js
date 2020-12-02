@@ -120,6 +120,7 @@ main_app.controller('scheduler_controller', function($scope, $http){
                     let confirmedSlotsEvents = responseData["confirmedSlot"];
                     let fullSlots = responseData["fullSlots"];
 
+                    //removed confirmed group from full slots
                     for (let i = 0; i < confirmedSlotsEvents.length; ++i){
                         let eachConfirmedEvent = confirmedSlotsEvents[i];
                         let confirmedGrp = eachConfirmedEvent["records"][0]["username"];
@@ -165,27 +166,24 @@ main_app.controller('scheduler_controller', function($scope, $http){
         alert("testing");
         $http.put("/confirmATimeslot", schedulerConfigs).then(function(response){
             let responseData = response.data;
-            if (Object.keys(responseData).length > 0){
-                let eventSources = [];
+            if (Array.isArray(responseData)){
+                let data = responseData[0]
+                let startTime = parseInt(data["startTime"])
+                let endTime = startTime + getSeconds(schedulerConfigs.maxPresentationTime) * 1000;
+                let groupNo = data["username"]
 
-                let sameTypeEventSource = eventCreator(responseData["sameTypeSlots"], "Cyan", "black");
-                let differentTypesEventSource = eventCreator(responseData["differentTypesSlots"], "", "black");
-                let confirmedEventSource = eventCreator(responseData["confirmedSlot"], "green", "black");
-                let fullEventSource = eventCreator(responseData["fullSlots"], "grey", "black");
-
-                if (confirmedEventSource.length > 0){
-                    eventSources = [...confirmedEventSource, ...fullEventSource];
-                } else {
-                    eventSources = [...sameTypeEventSource, ...differentTypesEventSource, ...confirmedEventSource, ...fullEventSource];
-                }
-                
-                calendar.addEventSource(eventSources);
+                calendar.addEvent({
+                    title: "Your Group - group "+groupNo+" will present",
+                    start: startTime,
+                    end: endTime,
+                    color: "Green", 
+                    textColor: "Black"
+                });
+                calendar.render();
+            } else {
+                alert(responseData);
             }
         });
-        // calendar.render();
-
-        //after successfully confirm a date, the calendar should rerender
-        //and show only the confirmed case.
     }
 });
 
@@ -197,10 +195,6 @@ function getSeconds(timeString){
     let second = parseInt(splittedStr[2]);
     return hour * 60 * 60 + minute * 60 + second
 }
-
-// function getGMTDate(year, month, day, hour=0, minute=0, second=0){
-//     return new Date(Date.UTC(year, month, day, hour, minute, second));
-// }
 
 function convertToGMTString(date){
     return date.toLocaleString("en-us", { timeZone: "GMT" });
