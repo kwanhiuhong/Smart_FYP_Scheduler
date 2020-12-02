@@ -165,7 +165,7 @@ router.delete('/clearData', function(req, res, next){
 function genRandomPassword(){
   let randPW = ''; 
   let str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +  
-          'abcdefghijklmnopqrstuvwxyz0123456789@#$'; 
+          'abcdefghijklmnopqrstuvwxyz0123456789!'; 
     
   for (i = 1; i <= 8; i++) { 
       let char = Math.floor(Math.random() * str.length + 1);

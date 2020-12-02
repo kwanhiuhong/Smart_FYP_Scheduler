@@ -154,7 +154,28 @@ router.put('/confirmATimeslot', bodyParser.json(), function(req, res, next){
           if (error2 == null){
             let allPossibleSlots = genAllPossibleISOSlots(initialDate, totalLength, hiddenDays,
               dayStartTime, dayEndTime, slotDuration, lunchHourStart, lunchHourEnd);
-
+            
+            let confirmedSlots = getConfirmedSlot(confirmedTimes, username);
+            let fullSlots = getFullSlots(confirmedSlots, maxNoOfGrpsInEachSlot);
+            let notFullSlots = getUnfullSlots(confirmedSlots, maxNoOfGrpsInEachSlot);
+            
+            if (confirmedSlots.length > 0){
+              let confirmedTime = new Date (confirmedSlots[0]["startTime"]);
+              res.send("Group " + username + " already has confirmed timeslot in " + confirmedTime + " !")
+            } else {
+              let flattenedListNotFullSlots = flattenListOfObj(notFullSlots, "startTime");
+              console.log("Not full slots");
+              console.log(flattenedListNotFullSlots);
+              let availableSlots = removeFromList(allPossibleSlots, flattenedListNotFullSlots);
+              console.log(availableSlots.length);
+              for (let i = 0; i < availableSlots.length; ++i){
+                
+              }
+              //get not full and possible slots
+              //then traverse it with loop of unavailable time, if ok break the loop
+              //then use that timeslot
+              //update db
+            }
             // let temp1 = getFullSlots(confirmedTimes, maxNoOfGrpsInEachSlot);
             // let temp2 = getUnfullSlots(confirmedTimes, maxNoOfGrpsInEachSlot);
             // let temp3 = getConfirmedSlot(confirmedTimes, username);

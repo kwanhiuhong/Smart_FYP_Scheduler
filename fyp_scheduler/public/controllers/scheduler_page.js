@@ -114,12 +114,37 @@ main_app.controller('scheduler_controller', function($scope, $http){
             } else if (typeof(responseData) == "object"){
                 if (Object.keys(responseData).length > 0){
                     let eventSources = [];
+
+                    let sameTypeSlotsEvents = responseData["sameTypeSlots"];
+                    let differentTypesSlotsEvents = responseData["differentTypesSlots"];
+                    let confirmedSlotsEvents = responseData["confirmedSlot"];
+                    let fullSlots = responseData["fullSlots"];
+
+                    for (let i = 0; i < confirmedSlotsEvents.length; ++i){
+                        let eachConfirmedEvent = confirmedSlotsEvents[i];
+                        let confirmedGrp = eachConfirmedEvent["records"][0]["username"];
+                        let timeSlot = eachConfirmedEvent["startTime"];
+                        for (let j = 0; j < fullSlots.length; ++j){
+                            let eachFullEvent = fullSlots[j];
+                            if (eachFullEvent["startTime"] == timeSlot){
+                                let records = eachFullEvent["records"];
+                                for(let k = 0; k < records.length; ++k){
+                                    let eachRecord = records[k];
+                                    if (eachRecord["username"] == confirmedGrp){
+                                        records.splice(k,1);
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
     
-                    let sameTypeEventSource = eventCreator(responseData["sameTypeSlots"], "Cyan", "black", "Your group - ");
-                    let differentTypesEventSource = eventCreator(responseData["differentTypesSlots"], "", "black", "Your group - ");
-                    let confirmedEventSource = eventCreator(responseData["confirmedSlot"], "green", "black", "Your group - ");
-                    let fullEventSource = eventCreator(responseData["fullSlots"], "grey", "black");
-    
+                    let sameTypeEventSource = eventCreator(sameTypeSlotsEvents, "Cyan", "black", "Your group - ");
+                    let differentTypesEventSource = eventCreator(differentTypesSlotsEvents, "", "black", "Your group - ");
+                    let confirmedEventSource = eventCreator(confirmedSlotsEvents, "green", "black", "Your group - ");
+                    let fullEventSource = eventCreator(fullSlots, "grey", "black");
+
                     if (confirmedEventSource.length > 0){
                         eventSources = [...confirmedEventSource, ...fullEventSource];
                     } else {
