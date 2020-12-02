@@ -25,7 +25,7 @@ main_app.controller('scheduler_controller', function($scope, $http){
     var calendarEl = document.getElementById('calendar');
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
-        selectable: true,
+        selectable: false,
         initialView: 'timeGridWeek',
         allDaySlot: false,
         hiddenDays: schedulerConfigs.hiddenDays, 
@@ -107,7 +107,7 @@ main_app.controller('scheduler_controller', function($scope, $http){
     });
 
     $scope.load = function(){
-        $http.get("/fetchEvents").then(function(response){
+        $http.get("/fetchEvents?maxNoPerSlot="+schedulerConfigs.maxNoOfGrpsInEachSlot).then(function(response){
             let responseData = response.data;
             if (typeof(responseData) == "string"){
                 alert(responseData);
@@ -115,19 +115,24 @@ main_app.controller('scheduler_controller', function($scope, $http){
                 if (Object.keys(responseData).length > 0){
                     let eventSources = [];
     
-                    let sameTypeEventSource = eventCreator(responseData["sameTypeSlots"], "Cyan", "black");
-                    let differentTypesEventSource = eventCreator(responseData["differentTypesSlots"], "", "black");
-                    let confirmedEventSource = eventCreator(responseData["confirmedSlot"], "green", "black");
+                    let sameTypeEventSource = eventCreator(responseData["sameTypeSlots"], "Cyan", "black", "Your group - ");
+                    let differentTypesEventSource = eventCreator(responseData["differentTypesSlots"], "", "black", "Your group - ");
+                    let confirmedEventSource = eventCreator(responseData["confirmedSlot"], "green", "black", "Your group - ");
                     let fullEventSource = eventCreator(responseData["fullSlots"], "grey", "black");
     
-                    eventSources = [...sameTypeEventSource, ...differentTypesEventSource, ...confirmedEventSource, ...fullEventSource];
-                    
+                    if (confirmedEventSource.length > 0){
+                        eventSources = [...confirmedEventSource, ...fullEventSource];
+                    } else {
+                        eventSources = [...sameTypeEventSource, ...differentTypesEventSource, ...confirmedEventSource, ...fullEventSource];
+                    }
+
                     calendar.addEventSource(eventSources);
                 }
             } else {
                 alert(responseData);
             }
         });
+        calendar.currentData.options.selectable = true;
         calendar.render();
     };
 
@@ -143,7 +148,11 @@ main_app.controller('scheduler_controller', function($scope, $http){
                 let confirmedEventSource = eventCreator(responseData["confirmedSlot"], "green", "black");
                 let fullEventSource = eventCreator(responseData["fullSlots"], "grey", "black");
 
-                eventSources = [...sameTypeEventSource, ...differentTypesEventSource, ...confirmedEventSource, ...fullEventSource];
+                if (confirmedEventSource.length > 0){
+                    eventSources = [...confirmedEventSource, ...fullEventSource];
+                } else {
+                    eventSources = [...sameTypeEventSource, ...differentTypesEventSource, ...confirmedEventSource, ...fullEventSource];
+                }
                 
                 calendar.addEventSource(eventSources);
             }
@@ -172,7 +181,7 @@ function convertToGMTString(date){
     return date.toLocaleString("en-us", { timeZone: "GMT" });
 }
 
-function eventCreator(timeslots, color, textColor){
+function eventCreator(timeslots, color, textColor, extraText = ""){
     let eventSources = [];
     if (timeslots.length > 0){
 
@@ -180,21 +189,23 @@ function eventCreator(timeslots, color, textColor){
             let eachEventObj = timeslots[i];
             let startTime = parseInt(eachEventObj["startTime"]);
             let endTime = startTime + isoNumberForPresentTime;
-            let content = "";
-            let event = {};
             
             for(let j = 0; j < eachEventObj["records"].length; ++j){
+                let content = "";
+                let event = {};
                 let eachRecord = eachEventObj["records"][j];
                 let username = eachRecord["username"];
                 let usertype = eachRecord["usertype"];
                 let reason = eachRecord["reasons"];
-                let isConfirmed = eachRecord["confirmed"];
-                content += "Group " + username + "'s " + usertype + ": " + reason + "\n";
+                if(usertype == undefined || reason == undefined){
+                    content += extraText + "Group " + username + " will present\n";
+                } else {
+                    content += extraText + "Group " + username + "'s " + usertype + ": " + reason + "\n";
+                }
+                event = {title: content, start: startTime, end: endTime, 
+                    color: color, textColor: textColor};
+                eventSources.push(event);
             }
-
-            event = {title: content, start: startTime, end: endTime, 
-                color: color, textColor: textColor};
-            eventSources.push(event);
         }
     }
     return eventSources;

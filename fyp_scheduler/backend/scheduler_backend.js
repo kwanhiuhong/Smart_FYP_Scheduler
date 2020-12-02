@@ -11,53 +11,70 @@ router.get('/fetchEvents', function(req, res, next) {
     res.send("No login session found");
   } else {
     let db = req.db;
+    let maxNoPerSlot = req.query.maxNoPerSlot;
     let dbUnavailableTime = db.get("UnavailableTime");
+    let dbConfirmedTime = db.get("ConfirmedTime");
+
     let grpNo = req.session.userInfo["username"];
     let usertype = req.session.userInfo["type"];
 
     let returnedDate = {"sameTypeSlots":[], "differentTypesSlots":[], "confirmedSlot":[], "fullSlots":[]};
 
-    dbUnavailableTime.find({},function(error, timeslotRecords){
-      if(error == null){
-        for (let i = 0; i < timeslotRecords.length; ++i){
-          let hasSameType = false, hasDifferentType = false;
-          let eachTimeslotRecord = timeslotRecords[i];
-
-          let sameTypeSlot = {}, sameTypeRecords = [];
-          let differentTypesSlot = {}, differentTypesRecords = [];
-
-          let startTime = eachTimeslotRecord["startTime"];
-          let listOfRecords = eachTimeslotRecord["records"];
-
-          for(let j = 0; j < listOfRecords.length; ++j){
-            let eachRecord = listOfRecords[j];
-
-            if(eachRecord["username"] == grpNo){
-              if(eachRecord["usertype"] == usertype){
-                sameTypeRecords.push(eachRecord);
-                hasSameType = true;
-              } else if (eachRecord["usertype"] != usertype){
-                differentTypesRecords.push(eachRecord);
-                hasDifferentType = true;
+    dbUnavailableTime.find({}, function(error, timeslotRecords){
+      dbConfirmedTime.find({}, function(err2, confirmedTimeslotRecords){
+        if(error == null){
+          if(err2 == null){
+            
+            //this part for gethering sameType and differentTypesSlots
+            for (let i = 0; i < timeslotRecords.length; ++i){
+              let hasSameType = false, hasDifferentType = false;
+              let eachTimeslotRecord = timeslotRecords[i];
+    
+              let sameTypeSlot = {}, sameTypeRecords = [];
+              let differentTypesSlot = {}, differentTypesRecords = [];
+    
+              let startTime = eachTimeslotRecord["startTime"];
+              let listOfRecords = eachTimeslotRecord["records"];
+    
+              for(let j = 0; j < listOfRecords.length; ++j){
+                let eachRecord = listOfRecords[j];
+    
+                if(eachRecord["username"] == grpNo){
+                  if(eachRecord["usertype"] == usertype){
+                    sameTypeRecords.push(eachRecord);
+                    hasSameType = true;
+                  } else if (eachRecord["usertype"] != usertype){
+                    differentTypesRecords.push(eachRecord);
+                    hasDifferentType = true;
+                  }
+                }
+              }
+              
+              if(hasSameType){
+                sameTypeSlot["startTime"] = startTime;
+                sameTypeSlot["records"] = sameTypeRecords;
+                returnedDate["sameTypeSlots"].push(sameTypeSlot);
+              } else if (hasDifferentType){
+                differentTypesSlot["startTime"] = startTime;
+                differentTypesSlot["records"] = differentTypesRecords;
+                returnedDate["differentTypesSlots"].push(differentTypesSlot);
               }
             }
-          }
-          
-          if(hasSameType){
-            sameTypeSlot["startTime"] = startTime;
-            sameTypeSlot["records"] = sameTypeRecords;
-            returnedDate["sameTypeSlots"].push(sameTypeSlot);
-          } else if (hasDifferentType){
-            differentTypesSlot["startTime"] = startTime;
-            differentTypesSlot["records"] = differentTypesRecords;
-            returnedDate["differentTypesSlots"].push(differentTypesSlot);
-          }
-        }
 
-        res.send(returnedDate);
-      } else {
-        res.send({});
-      }
+            //now we gather full and confirmed slots
+            let confirmedSlot = getConfirmedSlot(confirmedTimeslotRecords, grpNo);
+            let fullSlots = getFullSlots(confirmedTimeslotRecords, maxNoPerSlot);
+            returnedDate["confirmedSlot"] = confirmedSlot;
+            returnedDate["fullSlots"] = fullSlots;
+
+            res.send(returnedDate);
+          } else {
+            res.send(err2);
+          }
+        } else {
+          res.send(error);
+        }
+      })
     });
   }
 });
@@ -138,12 +155,19 @@ router.put('/confirmATimeslot', bodyParser.json(), function(req, res, next){
             let allPossibleSlots = genAllPossibleISOSlots(initialDate, totalLength, hiddenDays,
               dayStartTime, dayEndTime, slotDuration, lunchHourStart, lunchHourEnd);
 
+            // let temp1 = getFullSlots(confirmedTimes, maxNoOfGrpsInEachSlot);
+            // let temp2 = getUnfullSlots(confirmedTimes, maxNoOfGrpsInEachSlot);
+            // let temp3 = getConfirmedSlot(confirmedTimes, username);
 
-
-
-
-
-
+            // console.log("temp1");
+            // console.log(temp1);
+            // console.log(temp1[0]["records"]);
+            // console.log(temp1[0]["records"][0]);
+            // console.log("temp2");
+            // console.log(temp2);
+            // console.log("temp3");
+            // console.log(temp3);
+            // console.log(flattenListOfObj(temp1, "startTime"));
 
           } else {
             res.send(error);
@@ -194,6 +218,79 @@ function genAllPossibleISOSlots(initialDate, totalLength, hiddenDays, startTime,
   }
 
   return allSlots;
+}
+
+function grpHasConfirmedSlot(){
+  let hasConfirmedSlot = false;
+
+  return hasConfirmedSlot;
+}
+
+function getFullSlots(confirmedSlotsRecords, maxNoOfGrpsInEachSlot){
+  let fullSlots = []
+  for(let i = 0; i < confirmedSlotsRecords.length; ++i){    
+    let eachTimeslotRecord = confirmedSlotsRecords[i];
+    let timeSlotInIso = eachTimeslotRecord["startTime"];
+    let records = eachTimeslotRecord["records"];
+    if (records.length == maxNoOfGrpsInEachSlot){
+      let obj = {}
+      obj["startTime"] = timeSlotInIso;
+      obj["records"] = records;
+      fullSlots.push(obj);
+    }
+  }
+  return fullSlots
+}
+
+function getUnfullSlots(confirmedSlotsRecords, maxNoOfGrpsInEachSlot){
+  let notFullSlots = []
+  for(let i = 0; i < confirmedSlotsRecords.length; ++i){
+    let eachTimeslotRecord = confirmedSlotsRecords[i];
+    let timeSlotInIso = eachTimeslotRecord["startTime"];
+    let records = eachTimeslotRecord["records"];
+    if (records.length < maxNoOfGrpsInEachSlot){
+      let obj = {}
+      obj["startTime"] = timeSlotInIso;
+      obj["records"] = records;
+      notFullSlots.push(obj);
+    }
+  }
+  return notFullSlots
+}
+
+function getConfirmedSlot(confirmedSlotsRecords, groupNo){
+  let listOfObj = []
+  for(let i = 0; i < confirmedSlotsRecords.length; ++i){
+    let eachTimeslotRecord = confirmedSlotsRecords[i];
+    let timeSlotInIso = eachTimeslotRecord["startTime"];
+    let records = eachTimeslotRecord["records"];
+    for (let j = 0; j < records.length; ++j){
+      let eachRecord = records[j];
+      if (eachRecord["username"] == groupNo){
+        let obj = {}
+        obj["startTime"] = timeSlotInIso;
+        obj["records"] = [{"username": eachRecord["username"], "confirmed": true}];
+        listOfObj.push(obj);
+      }
+    }
+  }
+  return listOfObj
+}
+
+function flattenListOfObj(listOfObj, key){
+  let flattenedList = []
+  for (let i = 0; i < listOfObj.length; ++i){
+    let eachObj = listOfObj[i];
+    if (eachObj.hasOwnProperty(key)){
+      flattenedList.push(eachObj[key]);
+    }
+  }
+  return flattenedList;
+}
+
+function getAvailbleSlots(allPossibleSlots, confirmedSlotsRecords, maxNoOfGrpsInEachSlot){
+  let slotsThatAreNotFull = getUnfullSlots(confirmedSlotsRecords, maxNoOfGrpsInEachSlot);
+  return removeFromList(allPossibleSlots, slotsThatAreNotFull);
 }
 
 function getNewDate(anotherDate){
