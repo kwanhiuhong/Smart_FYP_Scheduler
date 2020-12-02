@@ -2,20 +2,19 @@ var main_app = angular.module('scheduler', []);
 
 //this is the time allowed for presentation
 var schedulerConfigs = {
-    initDate: new Date(2020, 10, 30, 9, 0, 0), //note that in javascript, 0 = Jan, 10 = Nov, 11 = Dec.
+    //note that in javascript, 0 = Jan, 10 = Nov, 11 = Dec.
+    initDate: new Date(2020, 10, 30, 0, 0, 0),
     totalLength: 12,
     maxNoOfGrpsInEachSlot: 2,
     startDayTime: '09:00:00',
     endDayTime: '19:00:00',
-    presentationTime: '00:20:00',
-    isoNumberPerMinute: 60000,
+    maxPresentationTime: '00:20:00',
+    isoNumberPerSecond: 1000,
     hiddenDays: [6, 0], // hide Sat and Sun
-    localeString: "en-us",
-    timeZone: "GMT"
 }
 
-var maxPresentationDuration = parseInt(schedulerConfigs.presentationTime.split(':')[1]);
-var isoNumberForPresentTime = maxPresentationDuration * schedulerConfigs.isoNumberPerMinute;
+var maxPresentationDuration = getSeconds(schedulerConfigs.maxPresentationTime);
+var isoNumberForPresentTime = maxPresentationDuration * schedulerConfigs.isoNumberPerSecond;
 var initialDate = schedulerConfigs.initDate;
 var endDate = new Date(initialDate);
 endDate.setDate(initialDate.getDate() + schedulerConfigs.totalLength);
@@ -24,12 +23,11 @@ main_app.controller('scheduler_controller', function($scope, $http){
     var calendarEl = document.getElementById('calendar');
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
-        timeZone: schedulerConfigs.timeZone,
         selectable: true,
         initialView: 'timeGridWeek',
         allDaySlot: false,
         hiddenDays: schedulerConfigs.hiddenDays, 
-        slotDuration: schedulerConfigs.presentationTime,
+        slotDuration: schedulerConfigs.maxPresentationTime,
         slotMinTime: schedulerConfigs.startDayTime,
         slotMaxTime: schedulerConfigs.endDayTime,
         initialDate: initialDate,
@@ -47,10 +45,10 @@ main_app.controller('scheduler_controller', function($scope, $http){
             let modalBtn = document.getElementById("modalButton");
             let modalTitle = document.getElementById("modalTitle");
             let modalBody = document.getElementById("modalBody");
-            let startTime = info.event._instance.range.start.toLocaleString(schedulerConfigs.localeString, { timeZone: schedulerConfigs.timeZone });
-            let endTime = info.event._instance.range.end.toLocaleString(schedulerConfigs.localeString, { timeZone: schedulerConfigs.timeZone });
+            let startTime = convertToGMTString(info.event._instance.range.start);
+            let endTime = convertToGMTString(info.event._instance.range.end);
 
-            modalTitle.innerHTML = "Info from: " + startTime.toString() + " to " + endTime.toString();
+            modalTitle.innerHTML = "Info from: " + startTime + " to " + endTime;
             modalBody.innerHTML = info.event.title;
             modalBtn.click();
             // alert(
@@ -66,9 +64,9 @@ main_app.controller('scheduler_controller', function($scope, $http){
         select: function(info) {
             var nameAndReason = prompt("Please input why you are unable to join this timeslot" 
                 + " from "
-                + info.start.toLocaleString(schedulerConfigs.localeString, { timeZone: schedulerConfigs.timeZone }).toString()
+                + info.start
                 + " to " 
-                + info.end.toLocaleString(schedulerConfigs.localeString, { timeZone: schedulerConfigs.timeZone }).toString()
+                + info.end
                 + "\n Enter your name and reason(s):");
 
             if (nameAndReason != null){
@@ -141,6 +139,22 @@ main_app.controller('scheduler_controller', function($scope, $http){
 });
 
 //helper functions
+function getSeconds(timeString){
+    let splittedStr = timeString.split(':');
+    let hour = parseInt(splittedStr[0]);
+    let minute = parseInt(splittedStr[1]);
+    let second = parseInt(splittedStr[2]);
+    return hour * 60 * 60 + minute * 60 + second
+}
+
+// function getGMTDate(year, month, day, hour=0, minute=0, second=0){
+//     return new Date(Date.UTC(year, month, day, hour, minute, second));
+// }
+
+function convertToGMTString(date){
+    return date.toLocaleString("en-us", { timeZone: "GMT" });
+}
+
 function eventCreator(timeslots, color, textColor){
     let eventSources = [];
     if (timeslots.length > 0){

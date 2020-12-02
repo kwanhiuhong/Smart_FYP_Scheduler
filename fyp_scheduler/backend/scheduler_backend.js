@@ -112,8 +112,8 @@ router.get('/confirmATimeslot', bodyParser.json(), function(req, res, next){
     console.log(schedulerConfigs);
 
     //retrieve all configs passed in
-    var maxPresentationDuration = parseInt(schedulerConfigs.presentationTime.split(':')[1]);
-    var maxDurationInISO = maxPresentationDuration * schedulerConfigs.isoNumberPerMinute;
+    var maxPresentationDuration = getSeconds(schedulerConfigs.maxPresentationTime);
+    var maxDurationInISO = maxPresentationDuration * schedulerConfigs.isoNumberPerSecond;
     var initialDate = schedulerConfigs.initDate;
     var endDate = new Date(initialDate);
     endDate.setDate(initialDate.getDate() + schedulerConfigs.totalLength);
@@ -159,5 +159,24 @@ router.get('/confirmATimeslot', bodyParser.json(), function(req, res, next){
     //step 3, which should be nested in step 2, go back to confirmed time and update the db
   }
 });
+
+//helper functions
+function removeFromList(listA, listB){
+  let newList = [];
+  for(let i = 0; i < listA.length; i++){
+    if(!listB.includes(listA[i])){
+      newList.push(listA[i]);
+    }
+  }
+  return newList;
+}
+
+function getSeconds(timeString){
+  let splittedStr = timeString.split(':');
+  let hour = parseInt(splittedStr[0]);
+  let minute = parseInt(splittedStr[1]);
+  let second = parseInt(splittedStr[2]);
+  return hour * 60 * 60 + minute * 60 + second
+}
 
 module.exports = router;
