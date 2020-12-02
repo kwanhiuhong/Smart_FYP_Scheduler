@@ -3,14 +3,16 @@ var main_app = angular.module('scheduler', []);
 //this is the time allowed for presentation
 var schedulerConfigs = {
     //note that in javascript, 0 = Jan, 10 = Nov, 11 = Dec.
-    initDate: new Date(2020, 10, 30, 0, 0, 0),
+    initDate: new Date(2020, 10, 30, 9, 30, 0),
     totalLength: 12,
     maxNoOfGrpsInEachSlot: 2,
-    startDayTime: '09:00:00',
-    endDayTime: '19:00:00',
+    startDayTime: '09:30:00',
+    endDayTime: '18:30:00',
     maxPresentationTime: '00:20:00',
     isoNumberPerSecond: 1000,
     hiddenDays: [6, 0], // hide Sat and Sun
+    lunchHourStart: '12:30:00',
+    lunchHourEnd: '14:30:00'
 }
 
 var maxPresentationDuration = getSeconds(schedulerConfigs.maxPresentationTime);
@@ -35,6 +37,18 @@ main_app.controller('scheduler_controller', function($scope, $http){
             start: initialDate,
             end: endDate
         },
+        businessHours: [
+            {
+                daysOfWeek: [ 1, 2, 3, 4, 5 ],
+                startTime: schedulerConfigs.startDayTime, // a start time (10am in this example)
+                endTime: schedulerConfigs.lunchHourStart, // an end time (6pm in this example)
+            },
+            {
+                daysOfWeek: [ 1, 2, 3, 4, 5 ],
+                startTime: schedulerConfigs.lunchHourEnd, // a start time (10am in this example)
+                endTime: schedulerConfigs.endDayTime, 
+            }
+        ],
         headerToolbar: {
             left: '',
             center: 'title',
@@ -45,6 +59,9 @@ main_app.controller('scheduler_controller', function($scope, $http){
             let modalBtn = document.getElementById("modalButton");
             let modalTitle = document.getElementById("modalTitle");
             let modalBody = document.getElementById("modalBody");
+            //this info.event._instance.range.start/end treats our calendar as GMT
+            //so when it shows HKT, it shows 8 hours later
+            //to rescue, we convert it back to GMT.
             let startTime = convertToGMTString(info.event._instance.range.start);
             let endTime = convertToGMTString(info.event._instance.range.end);
 
@@ -116,7 +133,7 @@ main_app.controller('scheduler_controller', function($scope, $http){
 
     $scope.confirmATime = function(){
         alert("testing");
-        $http.get("/confirmATimeslot", schedulerConfigs).then(function(response){
+        $http.put("/confirmATimeslot", schedulerConfigs).then(function(response){
             let responseData = response.data;
             if (Object.keys(responseData).length > 0){
                 let eventSources = [];

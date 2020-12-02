@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var bodyParser = require('body-parser');
 
 var maxGrpsForOneSlot = 2;
 var presentationMinutes = 20;
@@ -102,7 +103,7 @@ router.get('/insertEvent', function(req, res, next){
   }
 });
 
-router.get('/confirmATimeslot', bodyParser.json(), function(req, res, next){
+router.put('/confirmATimeslot', bodyParser.json(), function(req, res, next){
   if(!req.session.userInfo){
     res.send("No login session found");
   } else {
@@ -110,15 +111,21 @@ router.get('/confirmATimeslot', bodyParser.json(), function(req, res, next){
     let schedulerConfigs = req.body;
     console.log("Now printing scheduler configs");
     console.log(schedulerConfigs);
+    console.log(typeof(schedulerConfigs.initDate));
 
     //retrieve all configs passed in
-    var maxPresentationDuration = getSeconds(schedulerConfigs.maxPresentationTime);
-    var maxDurationInISO = maxPresentationDuration * schedulerConfigs.isoNumberPerSecond;
-    var initialDate = schedulerConfigs.initDate;
-    var endDate = new Date(initialDate);
-    endDate.setDate(initialDate.getDate() + schedulerConfigs.totalLength);
+    let slotDuration = schedulerConfigs.maxPresentationTime;
+    let initialDate = new Date(schedulerConfigs.initDate);
+    let totalLength = schedulerConfigs.totalLength;
+    let endDate = new Date(initialDate);
+    endDate.setDate(initialDate.getDate() + totalLength);
+
     let hiddenDays = schedulerConfigs.hiddenDays;
+    let dayStartTime = schedulerConfigs.startDayTime;
+    let dayEndTime = schedulerConfigs.endDayTime;
     let maxNoOfGrpsInEachSlot = schedulerConfigs.maxNoOfGrpsInEachSlot;
+    let lunchHourStart = schedulerConfigs.lunchHourStart;
+    let lunchHourEnd = schedulerConfigs.lunchHourEnd;
 
     let db = req.db;
     let dbUnavailableTime = db.get("UnavailableTime");
@@ -128,11 +135,8 @@ router.get('/confirmATimeslot', bodyParser.json(), function(req, res, next){
       if (error == null){
         dbUnavailableTime.find({}, function(error2, unavailableTimes){
           if (error2 == null){
-
-
-
-
-
+            let allPossibleSlots = genAllPossibleISOSlots(initialDate, totalLength, hiddenDays,
+              dayStartTime, dayEndTime, slotDuration, lunchHourStart, lunchHourEnd);
 
 
 
@@ -161,6 +165,41 @@ router.get('/confirmATimeslot', bodyParser.json(), function(req, res, next){
 });
 
 //helper functions
+function genAllPossibleISOSlots(initialDate, totalLength, hiddenDays, startTime, endTime, slotDuration, lunchHrStart, lunchHrEnd, isoPerSecond = 1000){
+  let allSlots = []
+  let initDate = getNewDate(initialDate);
+  let isoForInitDate = initDate.getTime()
+  let isoOneday = isoPerSecond * 24 * 60 * 60;
+
+  for(let i = 0; i <= totalLength; i++){
+    let anotherDateInIso = isoForInitDate + i * isoOneday;
+    let anotherDate = new Date(anotherDateInIso);
+    if (hiddenDays.includes(anotherDate.getDay())){
+      continue;
+    } else {
+      let dayStartTimeInIso = anotherDateInIso + isoPerSecond * getSeconds(startTime);
+      let lunchStartInIso = anotherDateInIso + isoPerSecond * getSeconds(lunchHrStart);
+      let lunchEndInIso = anotherDateInIso + isoPerSecond * getSeconds(lunchHrEnd);
+      let dayEndTimeInIso = anotherDateInIso + isoPerSecond * getSeconds(endTime);
+      let eachSlotInIso = isoPerSecond * getSeconds(slotDuration)
+      
+      for (let dateTimeIso = dayStartTimeInIso; dateTimeIso <= dayEndTimeInIso - eachSlotInIso; dateTimeIso += eachSlotInIso){
+        if (dateTimeIso > lunchStartInIso - eachSlotInIso && dateTimeIso < lunchEndInIso){
+          continue;
+        } else {
+          allSlots.push(dateTimeIso);
+        }
+      }
+    }
+  }
+
+  return allSlots;
+}
+
+function getNewDate(anotherDate){
+  return new Date(anotherDate.getYear()+1900, anotherDate.getMonth(), anotherDate.getDate(), 0, 0, 0);
+}
+
 function removeFromList(listA, listB){
   let newList = [];
   for(let i = 0; i < listA.length; i++){
