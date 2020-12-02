@@ -10,13 +10,13 @@ router.get('/fetchEvents', function(req, res, next) {
     res.send("No login session found");
   } else {
     let db = req.db;
-    let dbTimeCollection = db.get("PresentationTime");
+    let dbUnavailableTime = db.get("UnavailableTime");
     let grpNo = req.session.userInfo["username"];
     let usertype = req.session.userInfo["type"];
 
     let returnedDate = {"sameTypeSlots":[], "differentTypesSlots":[], "confirmedSlot":[], "fullSlots":[]};
 
-    dbTimeCollection.find({},function(error, timeslotRecords){
+    dbUnavailableTime.find({},function(error, timeslotRecords){
       if(error == null){
         for (let i = 0; i < timeslotRecords.length; ++i){
           let hasSameType = false, hasDifferentType = false;
@@ -74,13 +74,13 @@ router.get('/insertEvent', function(req, res, next){
                     "confirmed":confirmed, "reasons":reasons}
 
     let db = req.db;
-    let dbTimeCollection = db.get("PresentationTime");
+    let dbUnavailableTime = db.get("UnavailableTime");
 
-    dbTimeCollection.find({'startTime':startTime},function(error, timeslotRecords){
+    dbUnavailableTime.find({'startTime':startTime},function(error, timeslotRecords){
       if (timeslotRecords.length == 0){
-        dbTimeCollection.insert({'startTime': startTime, 'records':[newRecord]}, function(err){
+        dbUnavailableTime.insert({'startTime': startTime, 'records':[newRecord]}, function(err){
           if(error == null){
-            console.log("Successfully inserted records into PresentationTime");
+            console.log("Successfully inserted records into UnavailableTime");
             res.send("Success");
           } else {
             res.send(error);
@@ -89,9 +89,9 @@ router.get('/insertEvent', function(req, res, next){
       } else {
         console.log(timeslotRecords);
         let updatedRecords = timeslotRecords[0]["records"].push(newRecord);
-        dbTimeCollection.update({'startTime': startTime}, {$set: {"records": updatedRecords}}, function(err){
+        dbUnavailableTime.update({'startTime': startTime}, {$set: {"records": updatedRecords}}, function(err){
           if(error == null){
-            console.log("Successfully updated records in PresentationTime");
+            console.log("Successfully updated records in UnavailableTime");
             res.send("Success");
           } else {
             res.send(error);
@@ -99,6 +99,23 @@ router.get('/insertEvent', function(req, res, next){
         });
       }
     });
+  }
+});
+
+router.get('/confirmATimeslot', function(req, res, next){
+  if(!req.session.userInfo){
+    res.send("No login session found");
+  } else {
+    let username = req.session.userInfo['username'];
+    let userType = req.session.userInfo['type'];
+    let confirmed = true;
+    let startTime = req.query.startTime;;
+
+    let db = req.db;
+    let dbUnavailableTime = db.get("UnavailableTime");
+    let dbConfirmedTime = db.get("ConfirmedTime");
+    
+
   }
 });
 

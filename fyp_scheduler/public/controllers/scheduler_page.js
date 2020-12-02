@@ -2,12 +2,14 @@ var main_app = angular.module('scheduler', []);
 var presentationTime = '00:20:00';
 var iosNumberForPresentTime = 20 * 60000;
 
+//this is the time allowed for presentation
+//note that in javascript, 0 = Jan, 10 = Nov, 11 = Dec.
+var initialDate = new Date(2020, 10, 30);
+var endDate = new Date(initialDate);
+endDate.setDate(initialDate.getDate() + 12);
+
 main_app.controller('scheduler_controller', function($scope, $http){
     var calendarEl = document.getElementById('calendar');
-    // var initialDate = Date.parse('30 Nov 2020 09:30:00 GMT');
-    var initialDate = new Date(2020, 10, 30);
-    var endDate = new Date(initialDate);
-    endDate.setDate(initialDate.getDate() + 14);
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
         selectable: true,
@@ -65,19 +67,23 @@ main_app.controller('scheduler_controller', function($scope, $http){
                 + info.end.toString() 
                 + "\n Enter your name and reason(s):");
 
-            let isoNumber = Date.parse(info.start);
-            $http.get("/insertEvent?startTime="+isoNumber+"&reasons="+nameAndReason).then(function(response){
-                if (response.data === "Success") {
-                    (nameAndReason || info.view.type.match(/^timeGrid/)) && calendar.unselect(),
-                    nameAndReason && calendar.addEvent({
-                        title: nameAndReason,
-                        start: info.start,
-                        end: info.end
-                    })
-                } else {
-                    alert("Fail to add event to calendar, error: " + response.data);
-                } 
-            });
+            if (nameAndReason != null){
+                let isoNumber = Date.parse(info.start);
+                $http.get("/insertEvent?startTime="+isoNumber+"&reasons="+nameAndReason).then(function(response){
+                    if (response.data === "Success") {
+                        (info.view.type.match(/^timeGrid/)) && calendar.unselect(),
+                        calendar.addEvent({
+                            title: nameAndReason,
+                            start: info.start,
+                            end: info.end,
+                            color: "Cyan", 
+                            textColor: "Black"
+                        })
+                    } else {
+                        alert("Fail to add event to calendar, error: " + response.data);
+                    } 
+                });
+            }
         }
     });
 
@@ -122,13 +128,14 @@ function eventCreator(timeslots, color, textColor){
             }
 
             event = {title: content, start: startTime, end: endTime, 
-                color:color, textColor:textColor};
+                color: color, textColor: textColor};
             eventSources.push(event);
         }
     }
     return eventSources;
 }
 //date string convertor
+// var initialDate = Date.parse('30 Nov 2020 09:30:00 GMT');
 // const unixTimeZero = Date.parse('Tue Dec 01 2020 14:40:00 GMT+0800 (Hong Kong Standard Time)');
 // const javaScriptRelease = Date.parse('Tue Dec 01 2020 15:00:00 GMT+0800 (Hong Kong Standard Time)');
 
