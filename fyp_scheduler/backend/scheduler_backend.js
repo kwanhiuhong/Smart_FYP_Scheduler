@@ -102,20 +102,61 @@ router.get('/insertEvent', function(req, res, next){
   }
 });
 
-router.get('/confirmATimeslot', function(req, res, next){
+router.get('/confirmATimeslot', bodyParser.json(), function(req, res, next){
   if(!req.session.userInfo){
     res.send("No login session found");
   } else {
     let username = req.session.userInfo['username'];
-    let userType = req.session.userInfo['type'];
-    let confirmed = true;
-    let startTime = req.query.startTime;;
+    let schedulerConfigs = req.body;
+    console.log("Now printing scheduler configs");
+    console.log(schedulerConfigs);
+
+    //retrieve all configs passed in
+    var maxPresentationDuration = parseInt(schedulerConfigs.presentationTime.split(':')[1]);
+    var maxDurationInISO = maxPresentationDuration * schedulerConfigs.isoNumberPerMinute;
+    var initialDate = schedulerConfigs.initDate;
+    var endDate = new Date(initialDate);
+    endDate.setDate(initialDate.getDate() + schedulerConfigs.totalLength);
+    let hiddenDays = schedulerConfigs.hiddenDays;
+    let maxNoOfGrpsInEachSlot = schedulerConfigs.maxNoOfGrpsInEachSlot;
 
     let db = req.db;
     let dbUnavailableTime = db.get("UnavailableTime");
     let dbConfirmedTime = db.get("ConfirmedTime");
     
+    dbConfirmedTime.find({}, function(error, confirmedTimes){
+      if (error == null){
+        dbUnavailableTime.find({}, function(error2, unavailableTimes){
+          if (error2 == null){
 
+
+
+
+
+
+
+
+
+
+
+
+
+          } else {
+            res.send(error);
+          }
+        })
+      } else {
+        res.send(error);
+      }
+    })
+    //confirmed time structure similar to 
+    //step 1 goto confirmed time check if this group has confirmed time or not
+    //if no, generate the time slot that is allowed to choose
+    //this timeslot has a max limit of 2 confirmed slot, and 
+    //return an array containing the timeslot that is ok to choose
+    //step 2, which should be nested in step 1, goto unavailable time, for each in ok timeslot : 
+    //  for each in unavailable time: if unavailable time != oktimeslot -> done!
+    //step 3, which should be nested in step 2, go back to confirmed time and update the db
   }
 });
 
