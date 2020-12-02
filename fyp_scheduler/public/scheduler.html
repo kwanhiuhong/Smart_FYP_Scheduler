@@ -79,76 +79,14 @@
                                                 <a href="#"><span class="glyphicon glyphicon-remove icon_close" data-id="chat_window_1"></span></a>
                                             </div>
                                         </div>
-                                        <div class="panel-body msg_container_base" style="max-height: 400px; height:400px;">
-                                            <!-- <div class="row msg_container base_sent">
-                                                <div class="col-md-10 col-xs-10">
-                                                    <div class="messages msg_sent">
-                                                        <p>that mongodb thing looks good, huh?
-                                                        tiny master db, and huge document store</p>
-                                                        <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 col-xs-2 avatar">
-                                                    <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
-                                                </div>
-                                            </div> -->
-                                            <div class="row msg_container base_receive">
-                                                <div class="col-md-2 col-xs-2 avatar">
-                                                    <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
-                                                </div>
-                                                <div class="col-md-10 col-xs-10">
-                                                    <div class="messages msg_receive">
-                                                        <p>Welcome group 20 students! What would you like to do with this smart fyp scheduler?</p>
-                                                        <br>
-                                                        <p>1. Schedule a date (Please fill in the timeslot that you are not available)</p>
-                                                        <p>2. Reschedule a date (Cancel current date assigned and re-select unavailable slots)</p>
-                                                        <p>3. Generate a date</p>
-                                                        <p>4. Exit</p>
-                                                        <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row msg_container base_sent">
-                                                <div class="col-xs-10 col-md-10">
-                                                    <div class="messages msg_sent">
-                                                        <p>1</p>
-                                                        <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 col-xs-2 avatar">
-                                                    <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
-                                                </div>
-                                            </div>
-                                            <div class="row msg_container base_receive">
-                                                <div class="col-md-2 col-xs-2 avatar">
-                                                    <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
-                                                </div>
-                                                <div class="col-xs-10 col-md-10">
-                                                    <div class="messages msg_receive">
-                                                        <p>Great! Please pick the slot that are not available to you on the left, and please input your name and the reasons that 
-                                                            you are unable to join this timeslot! Then type "Done".
-                                                        </p>
-                                                        <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row msg_container base_sent">
-                                                <div class="col-md-10 col-xs-10 ">
-                                                    <div class="messages msg_sent">
-                                                        <p>Done</p>
-                                                        <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 col-xs-2 avatar">
-                                                    <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
-                                                </div>
-                                            </div>
+                                        <div class="panel-body msg_container_base" id="msgBody" style="max-height: 400px; height:400px;">
+                                            
                                         </div>
                                         <div class="panel-footer">
                                             <div class="input-group">
                                                 <input id="btn-input" type="text" class="form-control input-sm chat_input" placeholder="Write your response here..." />
                                                 <span class="input-group-btn">
-                                                <button class="btn btn-primary btn-sm" id="btn-chat">Send</button>
+                                                <button class="btn btn-primary btn-sm" id="btn-chat" ng-click="sendCmd()">Send</button>
                                                 </span>
                                             </div>
                                         </div>
@@ -165,3 +103,68 @@
         </div>
     </body>
 </html>
+
+<!-- <div class="row msg_container base_sent">
+    <div class="col-md-10 col-xs-10">
+        <div class="messages msg_sent">
+            <p>that mongodb thing looks good, huh?
+            tiny master db, and huge document store</p>
+            <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
+        </div>
+    </div>
+    <div class="col-md-2 col-xs-2 avatar">
+        <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+    </div>
+</div> 
+<div class="row msg_container base_receive">
+    <div class="col-md-2 col-xs-2 avatar">
+        <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+    </div>
+    <div class="col-md-10 col-xs-10">
+        <div class="messages msg_receive">
+            <p>Welcome group 20 students! What would you like to do with this smart fyp scheduler?</p>
+            <br>
+            <p>1. Schedule a date (Please fill in the timeslot that you are not available)</p>
+            <p>2. Reschedule a date (Cancel current date assigned and re-select unavailable slots)</p>
+            <p>3. Generate a date</p>
+            <p>4. Exit</p>
+            <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
+        </div>
+    </div>
+</div>
+<div class="row msg_container base_sent">
+    <div class="col-xs-10 col-md-10">
+        <div class="messages msg_sent">
+            <p>1</p>
+            <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
+        </div>
+    </div>
+    <div class="col-md-2 col-xs-2 avatar">
+        <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+    </div>
+</div>
+<div class="row msg_container base_receive">
+    <div class="col-md-2 col-xs-2 avatar">
+        <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+    </div>
+    <div class="col-xs-10 col-md-10">
+        <div class="messages msg_receive">
+            <p>Great! Please pick the slot that are not available to you on the left, and please input your name and the reasons that 
+                you are unable to join this timeslot! Then type "Done".
+            </p>
+            <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
+        </div>
+    </div>
+</div>
+<div class="row msg_container base_sent">
+    <div class="col-md-10 col-xs-10 ">
+        <div class="messages msg_sent">
+            <p>Done</p>
+            <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
+        </div>
+    </div>
+    <div class="col-md-2 col-xs-2 avatar">
+        <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+    </div>
+</div>
+-->
