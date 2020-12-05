@@ -23,7 +23,6 @@ endDate.setDate(initialDate.getDate() + schedulerConfigs.totalLength);
 
 main_app.controller('scheduler_controller', function($scope, $http){
     var calendarEl = document.getElementById('calendar');
-
     var calendar = new FullCalendar.Calendar(calendarEl, {
         selectable: false,
         initialView: 'timeGridWeek',
@@ -167,30 +166,38 @@ main_app.controller('scheduler_controller', function($scope, $http){
         $http.put("/confirmATimeslot", schedulerConfigs).then(function(response){
             let responseData = response.data;
             if (Array.isArray(responseData)){
-                let data = responseData[0]
-                let startTime = parseInt(data["startTime"])
-                let endTime = startTime + getSeconds(schedulerConfigs.maxPresentationTime) * 1000;
-                let groupNo = data["username"]
+                // let data = responseData[0]
+                // let startTime = parseInt(data["startTime"])
+                // let endTime = startTime + getSeconds(schedulerConfigs.maxPresentationTime) * 1000;
+                // let groupNo = data["username"]
 
-                calendar.addEvent({
-                    title: "Your Group - group "+groupNo+" will present",
-                    start: startTime,
-                    end: endTime,
-                    color: "Green", 
-                    textColor: "Black"
-                });
-                calendar.render();
+                // calendar.addEvent({
+                //     title: "Your Group - group "+groupNo+" will present",
+                //     start: startTime,
+                //     end: endTime,
+                //     color: "Green", 
+                //     textColor: "Black"
+                // });
+                // calendar.render();
+                refreshCalendar();
             } else {
                 alert(responseData);
             }
         });
     }
 
+    function refreshCalendar(){
+        let temp = calendar.getEventSources();
+        if (temp.length > 0){
+            temp[0].remove();
+            $scope.load();
+        }
+    }
+
     $scope.sendCmd = function(){
         let chatBox = document.getElementById("msgBody");
         chatBox.insertAdjacentHTML('beforeend', msg_base_receive());
     }
-
 });
 
 //helper functions for chatbox
