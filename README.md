@@ -43,6 +43,12 @@ https://expressjs.com/en/4x/api.html#router
 6. Bootstrap
 https://getbootstrap.com
 
+7. Font Awesome Icons
+https://fontawesome.com/v4.7.0/icons/
+
+8. Full Calendar
+https://fullcalendar.io/docs
+
 Specification:
 MongoDB version: 4.4.1
 NodeJS version: v12.18.4
@@ -50,11 +56,8 @@ AugularJS: 1.8.0
 (https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.min.js)
 ExpressJS: 4.16.1
 
-Some Dependencies:
-1. We need a calendar, please refer to the following links for docs, and installation details.
-https://fullcalendar.io/docs
-
 Some sample UIs:
+<br>
 <img src="https://github.com/kwanhiuhong/Smart_FYP_Scheduler/blob/master/admin_page.png">
 <img src="https://github.com/kwanhiuhong/Smart_FYP_Scheduler/blob/master/login_page.png">
 <img src="https://github.com/kwanhiuhong/Smart_FYP_Scheduler/blob/master/scheduler_page.png">
