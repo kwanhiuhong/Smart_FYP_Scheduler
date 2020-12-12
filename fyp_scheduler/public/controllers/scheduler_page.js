@@ -157,9 +157,14 @@ main_app.controller('scheduler_controller', function($scope, $http){
                 alert(responseData);
             }
         });
-        calendar.currentData.options.selectable = true;
+        canSelectTable(false);
         calendar.render();
     };
+
+    $scope.loadMsg = function(){
+        let chatBox = document.getElementById("msgBody");
+        chatBox.insertAdjacentHTML('beforeend', msg_base_receive());
+    }
 
     $scope.confirmATime = function(){
         alert("testing");
@@ -186,6 +191,14 @@ main_app.controller('scheduler_controller', function($scope, $http){
         });
     }
 
+    $scope.refresh = function(){
+        refreshCalendar();
+    }
+
+    function canSelectTable(canSelect){
+        calendar.currentData.options.selectable = canSelect;
+    }
+
     function refreshCalendar(){
         let temp = calendar.getEventSources();
         if (temp.length > 0){
@@ -204,17 +217,17 @@ main_app.controller('scheduler_controller', function($scope, $http){
 function msg_base_receive(msg=""){
     return "<div class='row msg_container base_receive'>" +
                 "<div class='col-md-2 col-xs-2 avatar'>" + 
-                    "<img src='http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg' class=' img-responsive '>" + 
+                    "<img src='./images/admin_icon.png' class=' img-responsive '>" + 
                 "</div>" + 
                 "<div class='col-md-10 col-xs-10'>" + 
                     "<div class='messages msg_receive'>" + 
                         "<p>Welcome group 20 students! What would you like to do with this smart fyp scheduler?</p>" + 
                         "<br>" + 
                         "<p>1. Schedule a date (Please fill in the timeslot that you are not available)</p>" + 
-                        "<p>2. Reschedule a date (Cancel current date assigned and re-select unavailable slots)</p>" + 
-                        "<p>3. Generate a date</p>" + 
+                        "<p>2. Reschedule a date (Cancel current assigned slot and re-select unavailable slots)</p>" + 
+                        "<p>3. Confirm a presentation slot</p>" + 
                         "<p>4. Exit</p>" +
-                        "<time datetime='2009-11-13T20:00'>Timothy • 51 min</time>" + 
+                        "<time datetime=''>Bot</time>" + 
                     "</div>" +
                 "</div>" +
             "</div>"
