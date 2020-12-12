@@ -16,7 +16,7 @@ var schedulerConfigs = {
 }
 
 var usrInfo;
-var eventsSource;
+var eventsSource = {};
 var maxPresentationDuration = getSeconds(schedulerConfigs.maxPresentationTime);
 var isoNumberForPresentTime = maxPresentationDuration * schedulerConfigs.isoNumberPerSecond;
 var initialDate = schedulerConfigs.initDate;
@@ -60,20 +60,12 @@ main_app.controller('scheduler_controller', function($scope, $http){
             let modalBtn = document.getElementById("modalButton");
             let modalTitle = document.getElementById("modalTitle");
             let modalBody = document.getElementById("modalBody");
-            //this info.event._instance.range.start/end treats our calendar as GMT
-            //so when it shows HKT, it shows 8 hours later
-            //to rescue, we convert it back to GMT.
             let startTime = convertToGMTString(info.event._instance.range.start);
             let endTime = convertToGMTString(info.event._instance.range.end);
 
             modalTitle.innerHTML = "Info from: " + startTime + " to " + endTime;
             modalBody.innerHTML = info.event.title;
             modalBtn.click();
-            // alert(
-            //     'Reasons: ' + info.event.title + "\n" + 
-            // );
-            // change the border color just for fun
-            // info.el.style.borderColor = 'red';
         },
         eventMouseEnter: function(info){
             let element = info.el;
@@ -226,14 +218,12 @@ main_app.controller('scheduler_controller', function($scope, $http){
     $scope.retrieveCmd = function(){
         let cmd = retrieveMsg();
         displayMsgOnCommandBox(msg_base_send(cmd));
-        let day;
         switch (cmd) {
             case "1" || 1:
                 selectUnavailableSlots();
                 break;
             case "2" || 2:
-                
-                canSelectTable(true);
+                reschedule();
                 break;
             case "3" || 3:
                 confirmADate();
@@ -263,6 +253,32 @@ main_app.controller('scheduler_controller', function($scope, $http){
         }
     }
 
+    function reschedule(){
+        if (Object.keys(eventsSource).length > 0){
+            if (eventsSource["confirmedSlot"].length == 0){
+                let sentMsg = msg_base_receive("You don't have confirmed slot, no need to reschedule :)");
+                displayMsgOnCommandBox(sentMsg);
+            } else {
+                let ans = confirm("Rescheduling will remove all your records, are you sure to continue?");
+                if (ans == true){
+                    $http.delete("/removeConfirmedSlot").then(function(response){
+                        if (response.data != "Success"){
+                            alert(reponse.data);
+                        } else {
+                            let msg = msg_base_receive("Deleted confirmed slot successfully");
+                            displayMsgOnCommandBox(msg);
+                            refreshCalendar();
+                            canSelectTable(true);
+                        }
+                    });
+                } 
+            }
+        } else {
+            let sentMsg = msg_base_receive("You don't have confirmed slot, no need to reschedule :)");
+            displayMsgOnCommandBox(sentMsg);
+        }
+    }
+
     function confirmADate(){
         canSelectTable(false);
         $scope.confirmATime();
@@ -271,9 +287,8 @@ main_app.controller('scheduler_controller', function($scope, $http){
     }
 
     function restartBot(){
-        canSelectTable(false);
         clearAllMsg();
-        displayMsgOnCommandBox(msg_base_receive_default(usrInfo["username"], usrInfo["type"]));
+        $scope.loadMsg();
     }
 });
 

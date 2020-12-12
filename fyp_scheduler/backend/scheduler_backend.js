@@ -126,6 +126,68 @@ router.get('/insertEvent', function(req, res, next){
   }
 });
 
+router.delete('/removeConfirmedSlot', function(req, res, next){
+  let usrInfo = req.session.userInfo;
+  if(!usrInfo){
+    res.send("No login session found");
+  } else {
+    let db = req.db;
+    let dbConfirmedTime = db.get("ConfirmedTime");
+    
+    dbConfirmedTime.find({}, function(error, confirmedTimes){
+      if (error == null){
+  
+        for(let i = 0; i < confirmedTimes.length; ++i){
+          let eachTimeslotRecord = confirmedTimes[i];
+          let startTimeInIso = eachTimeslotRecord["startTime"];
+          let records = eachTimeslotRecord["records"];
+          let hasUpdate = false;
+          for (let j = 0; j < records.length; ++j){
+            let eachRecord = records[j];
+            if (eachRecord["username"] == usrInfo["username"]){
+              hasUpdate = true;
+              records.splice(j, 1);
+              j--;
+            }
+          }
+
+          if (hasUpdate && records.length == 0){
+            //delete
+            dbConfirmedTime.remove({"startTime":startTimeInIso.toString()}, function (err) {
+              if (err == null){
+                console.log("Deleted confirmed time successfully");
+              } else {
+                console.log("Failed to delete confirmed time");
+                console.log(err);
+                res.send(err);
+              }
+            });
+          } else if (hasUpdate && records.length > 0) {
+            //update
+            dbConfirmedTime.update({'startTime': startTimeInIso.toString()}, {$set: {"records": records}}, function(err){
+              if (err == null) {
+                console.log("Updated confirmed time successfully");
+              } else {
+                console.log("Failed to update confirmed time");
+                console.log(err);
+                res.send(err);
+              }
+            });
+          }
+        }  
+        res.send("Success");
+      } else {
+        console.log("Error when getting confirmed time");
+        res.send(error);
+      }
+    });
+  }
+});
+
+router.delete('/removeUnavailableSlot', function(req, res, next){
+
+});
+
 router.put('/confirmATimeslot', bodyParser.json(), function(req, res, next){
   if(!req.session.userInfo){
     res.send("No login session found");
@@ -271,12 +333,6 @@ function genAllPossibleISOSlots(initialDate, totalLength, hiddenDays, startTime,
   return allSlots;
 }
 
-function grpHasConfirmedSlot(){
-  let hasConfirmedSlot = false;
-
-  return hasConfirmedSlot;
-}
-
 function getUnavailableSlots(unavailableSlotsRecords, grpNo){
   let unavailableSlots = []
   for(let i = 0; i < unavailableSlotsRecords.length; ++i){    
@@ -357,11 +413,6 @@ function flattenListOfObj(listOfObj, key){
     }
   }
   return flattenedList;
-}
-
-function getAvailbleSlots(allPossibleSlots, confirmedSlotsRecords, maxNoOfGrpsInEachSlot){
-  let slotsThatAreNotFull = getUnfullSlots(confirmedSlotsRecords, maxNoOfGrpsInEachSlot);
-  return removeFromList(allPossibleSlots, slotsThatAreNotFull);
 }
 
 function getNewDate(anotherDate){
