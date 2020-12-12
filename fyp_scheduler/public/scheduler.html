@@ -30,8 +30,7 @@
     <body ng-app="scheduler" ng-controller="scheduler_controller">
         <div class="jumbotron d-flex align-items-center min-vh-100" >
             <div class="container" style="max-width: 95%;">
-                <div class="row" style="padding:10">
-                    <a>Welcome Group!</a>
+                <div class="row" id="welcomeHeader" style="padding:10">
                 </div>
 
                 <!-- Modal -->
@@ -59,12 +58,6 @@
                 </div>
                 
                 <button ng-click="refresh()" style="border: none;"><i class="fas fa-redo-alt"></i></button>
-                <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="hi" ng-click="confirmATime()">
-                    Confirm a date
-                </button>
-                <!-- <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="hi" ng-click="testing()">
-                    testing
-                </button> -->
                 <div class="row">
                     <div class="col col-lg-7" ng-init="load()">
                         <div id='calendar'></div>

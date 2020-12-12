@@ -2,10 +2,15 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 
-var maxGrpsForOneSlot = 2;
-var presentationMinutes = 20;
-
 /* GET users listing. */
+router.get('/fetchUserInfo', function(req, res, next){
+  if(!req.session.userInfo){
+    res.send("No login session found");
+  } else {
+    res.send(req.session.userInfo);
+  }
+})
+
 router.get('/fetchEvents', function(req, res, next) {
   if(!req.session.userInfo){
     res.send("No login session found");

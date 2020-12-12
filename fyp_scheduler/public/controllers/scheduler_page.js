@@ -15,6 +15,8 @@ var schedulerConfigs = {
     lunchHourEnd: '14:30:00'
 }
 
+var usrInfo;
+var eventsSource;
 var maxPresentationDuration = getSeconds(schedulerConfigs.maxPresentationTime);
 var isoNumberForPresentTime = maxPresentationDuration * schedulerConfigs.isoNumberPerSecond;
 var initialDate = schedulerConfigs.initDate;
@@ -113,6 +115,7 @@ main_app.controller('scheduler_controller', function($scope, $http){
                 alert(responseData);
             } else if (typeof(responseData) == "object"){
                 if (Object.keys(responseData).length > 0){
+                    eventsSource = responseData;
                     let eventSources = [];
 
                     let sameTypeSlotsEvents = responseData["sameTypeSlots"];
@@ -162,8 +165,21 @@ main_app.controller('scheduler_controller', function($scope, $http){
     };
 
     $scope.loadMsg = function(){
-        let chatBox = document.getElementById("msgBody");
-        chatBox.insertAdjacentHTML('beforeend', msg_base_receive_default());
+        $http.get("/fetchUserInfo").then(function(response){
+            let chatBox = document.getElementById("msgBody");
+            let welcomeHeader = document.getElementById("welcomeHeader");
+            if (typeof(response.data) == "object"){
+                usrInfo = response.data;
+                let welcomeMsg = "<a>Welcome group " + usrInfo["username"] + "!</a>";
+                let msg = msg_base_receive_default(usrInfo["username"], usrInfo["type"]);
+                welcomeHeader.innerHTML = welcomeMsg;
+                chatBox.insertAdjacentHTML('beforeend', msg);
+            } else {
+                let msg = "No login session found!";
+                welcomeHeader.innerHTML = "<a>" + msg + "</a>";
+                chatBox.insertAdjacentHTML('beforeend', msg_base_receive(msg));
+            }
+        });
     }
 
     $scope.confirmATime = function(){
@@ -223,8 +239,7 @@ main_app.controller('scheduler_controller', function($scope, $http){
                 confirmADate();
                 break;
             case "4" || 4:
-                clearAllMsg();
-                displayMsgOnCommandBox(msg_base_receive_default());
+                restartBot();
                 break;
             default:
                 let sentMsg = msg_base_receive("Please input the right command 1/2/3/4!");
@@ -233,9 +248,19 @@ main_app.controller('scheduler_controller', function($scope, $http){
     }
 
     function selectUnavailableSlots(){
-        canSelectTable(true);
-        let sentMsg = msg_base_receive("You can now select your unavailable slots on the calendar!");
-        displayMsgOnCommandBox(sentMsg);
+        let defaultMsg = msg_base_receive("You already had confirmed slot. If you wish to reschedule, please trigger the rescheduling command.");
+        canSelectTable(false);
+        if (Object.keys(eventsSource).length > 0){
+            if (eventsSource["confirmedSlot"].length == 0){
+                canSelectTable(true);
+                let sentMsg = msg_base_receive("You can now select your unavailable slots on the calendar!");
+                displayMsgOnCommandBox(sentMsg);
+            } else {
+                displayMsgOnCommandBox(defaultMsg);
+            }
+        } else {
+            displayMsgOnCommandBox(defaultMsg);
+        }
     }
 
     function confirmADate(){
@@ -243,6 +268,12 @@ main_app.controller('scheduler_controller', function($scope, $http){
         $scope.confirmATime();
         let sentMsg = msg_base_receive("Operation completed!");
         displayMsgOnCommandBox(sentMsg);
+    }
+
+    function restartBot(){
+        canSelectTable(false);
+        clearAllMsg();
+        displayMsgOnCommandBox(msg_base_receive_default(usrInfo["username"], usrInfo["type"]));
     }
 });
 
@@ -269,23 +300,14 @@ function displayMsgOnCommandBox(msg=""){
     scollCmdBoxToBottom();
 }
 
-function msg_base_receive_default(){
-    return "<div class='row msg_container base_receive'>" +
-                "<div class='col-md-2 col-xs-2 avatar'>" + 
-                    "<img src='./images/admin_icon.png' class=' img-responsive '>" + 
-                "</div>" + 
-                "<div class='col-md-10 col-xs-10'>" + 
-                    "<div class='messages msg_receive'>" + 
-                        "<p>Welcome group 20 students! What would you like to do with this smart fyp scheduler?</p>" + 
-                        "<br>" + 
-                        "<p>1. Select unavailable slots</p>" + 
-                        "<p>2. Reschedule the assigned timeslot (Cancel current assigned slot and re-select unavailable slots)</p>" + 
-                        "<p>3. Confirm a presentation slot</p>" + 
-                        "<p>4. Exit</p>" +
-                        "<time datetime=''>Bot</time>" + 
-                    "</div>" +
-                "</div>" +
-            "</div>"
+function msg_base_receive_default(groupNo, identity){
+    let msg =   "<p>Welcome group " + groupNo + " " + identity + "! What would you like to do with this smart fyp scheduler?</p>" + 
+                "<br>" + 
+                "<p>1. Select unavailable slots</p>" + 
+                "<p>2. Reschedule the assigned timeslot (Cancel current assigned slot and re-select unavailable slots)</p>" + 
+                "<p>3. Confirm a presentation slot</p>" + 
+                "<p>4. Exit</p>"
+    return msg_base_receive(msg);
 }
 
 function msg_base_receive(msg){
