@@ -89,14 +89,15 @@ main_app.controller('scheduler_controller', function($scope, $http){
                 let isoNumber = Date.parse(info.start);
                 $http.get("/insertEvent?startTime="+isoNumber+"&reasons="+nameAndReason).then(function(response){
                     if (response.data === "Success") {
-                        (info.view.type.match(/^timeGrid/)) && calendar.unselect(),
-                        calendar.addEvent({
-                            title: nameAndReason,
-                            start: info.start,
-                            end: info.end,
-                            color: "Cyan", 
-                            textColor: "Black"
-                        })
+                        // (info.view.type.match(/^timeGrid/)) && calendar.unselect(),
+                        // calendar.addEvent({
+                        //     title: nameAndReason,
+                        //     start: info.start,
+                        //     end: info.end,
+                        //     color: "Cyan", 
+                        //     textColor: "Black"
+                        // })
+                        refreshCalendar();
                     } else {
                         alert("Fail to add event to calendar, error: " + response.data);
                     } 
@@ -158,16 +159,14 @@ main_app.controller('scheduler_controller', function($scope, $http){
             }
         });
         canSelectTable(false);
-        calendar.render();
     };
 
     $scope.loadMsg = function(){
         let chatBox = document.getElementById("msgBody");
-        chatBox.insertAdjacentHTML('beforeend', msg_base_receive());
+        chatBox.insertAdjacentHTML('beforeend', msg_base_receive_default());
     }
 
     $scope.confirmATime = function(){
-        alert("testing");
         $http.put("/confirmATimeslot", schedulerConfigs).then(function(response){
             let responseData = response.data;
             if (Array.isArray(responseData)){
@@ -197,6 +196,7 @@ main_app.controller('scheduler_controller', function($scope, $http){
 
     function canSelectTable(canSelect){
         calendar.currentData.options.selectable = canSelect;
+        calendar.render();
     }
 
     function refreshCalendar(){
@@ -207,14 +207,69 @@ main_app.controller('scheduler_controller', function($scope, $http){
         }
     }
 
-    $scope.sendCmd = function(){
-        let chatBox = document.getElementById("msgBody");
-        chatBox.insertAdjacentHTML('beforeend', msg_base_receive());
+    $scope.retrieveCmd = function(){
+        let cmd = retrieveMsg();
+        displayMsgOnCommandBox(msg_base_send(cmd));
+        let day;
+        switch (cmd) {
+            case "1" || 1:
+                selectUnavailableSlots();
+                break;
+            case "2" || 2:
+                
+                canSelectTable(true);
+                break;
+            case "3" || 3:
+                confirmADate();
+                break;
+            case "4" || 4:
+                clearAllMsg();
+                displayMsgOnCommandBox(msg_base_receive_default());
+                break;
+            default:
+                let sentMsg = msg_base_receive("Please input the right command 1/2/3/4!");
+                displayMsgOnCommandBox(sentMsg);
+          }
+    }
+
+    function selectUnavailableSlots(){
+        canSelectTable(true);
+        let sentMsg = msg_base_receive("You can now select your unavailable slots on the calendar!");
+        displayMsgOnCommandBox(sentMsg);
+    }
+
+    function confirmADate(){
+        canSelectTable(false);
+        $scope.confirmATime();
+        let sentMsg = msg_base_receive("Operation completed!");
+        displayMsgOnCommandBox(sentMsg);
     }
 });
 
-//helper functions for chatbox
-function msg_base_receive(msg=""){
+function clearAllMsg(){
+    let chatBox = document.getElementById("msgBody");
+    chatBox.innerHTML = "";
+}
+
+function retrieveMsg(){
+    let inputBox = document.getElementById("btn-input");
+    let msg = inputBox.value;
+    inputBox.value = "";
+    return msg;
+}
+
+function scollCmdBoxToBottom(){
+    let msgBody = document.getElementById("msgBody");
+    msgBody.scrollTop = msgBody.scrollHeight;
+}
+
+function displayMsgOnCommandBox(msg=""){
+    let chatBox = document.getElementById("msgBody");
+    chatBox.insertAdjacentHTML('beforeend', msg);
+    scollCmdBoxToBottom();
+}
+
+function msg_base_receive_default(){
     return "<div class='row msg_container base_receive'>" +
                 "<div class='col-md-2 col-xs-2 avatar'>" + 
                     "<img src='./images/admin_icon.png' class=' img-responsive '>" + 
@@ -223,8 +278,8 @@ function msg_base_receive(msg=""){
                     "<div class='messages msg_receive'>" + 
                         "<p>Welcome group 20 students! What would you like to do with this smart fyp scheduler?</p>" + 
                         "<br>" + 
-                        "<p>1. Schedule a date (Please fill in the timeslot that you are not available)</p>" + 
-                        "<p>2. Reschedule a date (Cancel current assigned slot and re-select unavailable slots)</p>" + 
+                        "<p>1. Select unavailable slots</p>" + 
+                        "<p>2. Reschedule the assigned timeslot (Cancel current assigned slot and re-select unavailable slots)</p>" + 
                         "<p>3. Confirm a presentation slot</p>" + 
                         "<p>4. Exit</p>" +
                         "<time datetime=''>Bot</time>" + 
@@ -233,7 +288,32 @@ function msg_base_receive(msg=""){
             "</div>"
 }
 
+function msg_base_receive(msg){
+    return "<div class='row msg_container base_receive'>" +
+                "<div class='col-md-2 col-xs-2 avatar'>" + 
+                    "<img src='./images/admin_icon.png' class=' img-responsive '>" + 
+                "</div>" + 
+                "<div class='col-md-10 col-xs-10'>" + 
+                    "<div class='messages msg_receive'>" + 
+                        "<p>" + msg + "</p>" + 
+                        "<time datetime=''>Bot</time>" + 
+                    "</div>" +
+                "</div>" +
+            "</div>"
+}
 
+function msg_base_send(msg=""){
+    return "<div class='row msg_container base_sent'>" + 
+                "<div class='col-xs-10 col-md-10'>" + 
+                    "<div class='messages msg_sent'>" + 
+                        "<p>" + msg + "</p>" + 
+                    "</div>" + 
+                "</div>" + 
+                "<div class='col-md-2 col-xs-2 avatar'>" + 
+                    "<img src='./images/user_icon.png' class=' img-responsive '>" + 
+                "</div>" + 
+            "</div>"
+}
 
 //helper functions
 function getSeconds(timeString){
