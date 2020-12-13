@@ -26,18 +26,23 @@ main_app.controller('admin_page_controller', function($scope, $http){
         $http.get("/getData").then(function(response){
             let length = response.data.length;
             if(length > 0){
-
-                let excelArrayObj = [];
-                for(let i = 0; i < length; i++){
-                    let raw_data = new Map(Object.entries(response.data[i]));
-                    excelArrayObj.push(raw_data);
-                }
-
+                
                 let headers = Object.keys(response.data[0]);
+                let excel2DArray = [];                
 
+                for(let i = 0; i < length; i++){
+                    let obj = response.data[i];
+                    let array = [];
+                    for (let j = 0; j < headers.length; ++j){
+                        let key = headers[j];
+                        array.push(obj[key]);
+                    }
+                    excel2DArray.push(array);
+                }
+                
                 $scope.show_no_data = false;
                 $scope.headers = headers;
-                $scope.fyp_data = excelArrayObj;
+                $scope.fyp_data = excel2DArray;
                 $scope.show_table = true;
             } else {
                 $scope.show_no_data = true;

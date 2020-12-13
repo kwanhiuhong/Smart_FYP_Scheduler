@@ -76,6 +76,9 @@ router.put('/importData', bodyParser.json(), function(req, res, next){
         mapObjArray.push(map);
       }
 
+      console.log("See mapObjArray");
+      console.log(mapObjArray);
+
       //now convert it back to an array of plain object/JSON form
       for (let i = 0; i < mapObjArray.length; i++){
         let obj = {};
@@ -100,6 +103,9 @@ router.put('/importData', bodyParser.json(), function(req, res, next){
         passwordObjArray.push(studentPwObj);
         objArray.push(obj);
       }
+
+      console.log("Now see objArray");
+      console.log(objArray);
 
       //insert group info record into the GroupInfo collection
       let group_info_collection = db.get("GroupInfo");

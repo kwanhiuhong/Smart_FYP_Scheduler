@@ -45,9 +45,10 @@
                             </tr>
                             </thead>
                             <tbody>
-                                <tbody ng-repeat="rows in fyp_data">
+                                <tbody ng-repeat="row in fyp_data">
                                     <tr>
-                                        <td ng-repeat="(key, value) in rows | fromMap">{{value}}</td>
+                                        <!-- <td ng-repeat="(key, value) in rows | fromMap">{{value}}</td> -->
+                                        <td ng-repeat="value in row track by $index">{{value}}</td>
                                     </tr>
                                 </tbody>
                             </tbody>
