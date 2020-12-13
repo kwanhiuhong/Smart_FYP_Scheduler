@@ -35,8 +35,10 @@ Type the following command in the terminal:<br>
 `db.createCollection("GroupInfo")`<br>
 `db.createCollection("UnavailableTime")`<br>
 `db.createCollection("User")`<br>
-For more command MongoDB commands, pls refer to [here](#Common-MongoDB-Commands)
 Note that we have 4 collections in total.
+`db.User.insert({"username" : "admin", "password" : "admin", "type" : "admin"})`<br>
+(You need this to login into the admin page)
+For other common usedly MongoDB commands, pls refer to [here](#Common-MongoDB-Commands)
 ![](https://i.imgur.com/LvLcHNR.png)
 
 5. Open a web browser and type in "https://localhost:3000" to start the web app.
