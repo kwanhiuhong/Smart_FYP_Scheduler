@@ -1,6 +1,11 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
+var adminRecord = {
+  "username": "admin",
+  "password": "admin",
+  "type": "admin"
+}
 
 router.get('/checkLogin', function(req, res, next) {
   if(req.session.userInfo){
@@ -29,10 +34,10 @@ router.get('/getData', function(req, res, next){
 router.put('/importData', bodyParser.json(), function(req, res, next){
   if(!req.session.userInfo){
     res.send("No login session found");
-  } else if (req.session.userInfo["type"] != "admin") {
+  } else if (req.session.userInfo["type"] != adminRecord.type) {
     res.send("You are not an admin!");
   } else {
-      //this is a object of objects
+    //this is a object of objects
     var data = req.body;
 
     //an array of map object
@@ -109,11 +114,15 @@ router.put('/importData', bodyParser.json(), function(req, res, next){
               console.log("Successfully inserted records into User");
               res.send("Success");
             }  else {
+              console.log("Fail to insert records into User, see error:");
+              console.log(error);
               res.send(error);
             }
           });
 
         } else {
+          console.log("Fail to insert records into GroupInfo, see error:");
+          console.log(error);
           res.send(error);
         }
       });
@@ -125,28 +134,23 @@ router.delete('/clearData', function(req, res, next){
   //if not admin, not allowed to clear data
   if(!req.session.userInfo){
     res.send("No login session found");
-  } else if (req.session.userInfo["type"] != "admin") {
+  } else if (req.session.userInfo["type"] != adminRecord.type) {
     res.send("You are not an admin!");
   } else {
     let db = req.db;
     //removed all records in GroupInfo
     let group_info_collection = db.get("GroupInfo");
-    group_info_collection.remove({}, function(error){
-      if(error == null){
-        console.log("Successfully removed records in GroupInfo");
-      } else {
-        res.send(error);
-      }
-    });
+    let user_collection = db.get("User");
+    let confirmedTime_collection = db.get("ConfirmedTime");
+    let unavailableTime_collection = db.get("UnavailableTime");
   
     //remove all records in User
-    let user_collection = db.get("User");
     user_collection.remove({}, function(error){
       if(error == null){
-        console.log("Successfully removed records in User");
+        console.log("Removed all user records");
   
         //add back admin record into the User collection
-        user_collection.insert({"username":"admin", "password":"admin", "type":"admin"}, function(error){
+        user_collection.insert({"username":adminRecord.username, "password":adminRecord.password, "type":adminRecord.type}, function(error){
           if(error == null){
             console.log("Successfully inserted admin back to User");
             res.send("Success");
@@ -158,6 +162,17 @@ router.delete('/clearData', function(req, res, next){
         res.send(error);
       }
     });
+
+    group_info_collection.remove({}, function(err){
+      if(err == null){console.log("Removed all group records");}
+    });
+    //remove all confirmed/unavailable slots
+    confirmedTime_collection.remove({}, function(err){
+      if(err == null){console.log("Removed all confirmed slot")};
+    })
+    unavailableTime_collection.remove({}, function(err){
+      if(err == null){console.log("Removed all unavailable slot")};
+    })
   }
 });
 

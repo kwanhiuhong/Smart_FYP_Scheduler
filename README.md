@@ -58,6 +58,6 @@ ExpressJS: 4.16.1
 
 Some sample UIs:
 <br>
-<img src="https://github.com/kwanhiuhong/Smart_FYP_Scheduler/blob/master/admin_page.png">
-<img src="https://github.com/kwanhiuhong/Smart_FYP_Scheduler/blob/master/login_page.png">
-<img src="https://github.com/kwanhiuhong/Smart_FYP_Scheduler/blob/master/scheduler_page.png">
+<img src="https://github.com/kwanhiuhong/Smart_FYP_Scheduler/blob/master/demo/admin_page.png">
+<img src="https://github.com/kwanhiuhong/Smart_FYP_Scheduler/blob/master/demo/login_page.png">
+<img src="https://github.com/kwanhiuhong/Smart_FYP_Scheduler/blob/master/demo/scheduler_page.png">

@@ -93,6 +93,10 @@ main_app.controller('admin_page_controller', function($scope, $http){
         let excelArrayJson = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet]);
         let length = excelArrayJson.length;
 
+        excelArrayJson.forEach(obj => removeSpecialCharInKey(obj));
+        let allKeys = getAllKeys(excelArrayJson);
+        excelArrayJson = applyKeysToListOfObj(allKeys, excelArrayJson);
+
         let excelJsonJson = {};
         for(let i = 1; i <= length; i++){
             excelJsonJson[i] = excelArrayJson[i-1];
@@ -126,3 +130,53 @@ main_app.controller('admin_page_controller', function($scope, $http){
         saveAs(blob, "GroupInfo.xls");
     };
 });
+
+function getAllKeys(listOfObj){
+    let keys = [];
+    for (let i = 0; i < listOfObj.length; ++i){
+        let eachObj = listOfObj[i];
+        let allKeys = Object.keys(eachObj);
+        for (let j = 0; j < allKeys.length; ++j){
+            let eachKey = allKeys[j];
+            if (!keys.includes(eachKey)){
+                keys.push(eachKey);
+            }
+        }
+    }
+    return keys;
+}
+
+function applyKeysToListOfObj(keys, inputLstOfObj){
+    let listOfObj = [];
+    for (let i = 0; i < inputLstOfObj.length; ++i){
+        let eachObj = inputLstOfObj[i];
+        for (let j = 0; j < keys.length; ++j){
+            let key = keys[j];
+            if (!(key in eachObj)){
+                eachObj[key] = "";
+            }
+        }
+        listOfObj.push(eachObj);
+    }
+    return listOfObj;
+}
+
+function removeSpecialCharInKey(obj){
+    let specialChar = ".";
+    let allKeys = Object.keys(obj);
+    for (let i = 0; i < allKeys.length; ++i){
+        let key = allKeys[i];
+        if (key.includes(specialChar)){
+            let newKey = key.replace(specialChar, "");
+            obj = changeKey(obj, key, newKey);
+        }
+    }
+    return obj;
+}
+
+function changeKey(obj, oldKey, newKey){
+    Object.defineProperty(obj, newKey,
+        Object.getOwnPropertyDescriptor(obj, oldKey));
+    delete obj[oldKey];
+    return obj;
+}
