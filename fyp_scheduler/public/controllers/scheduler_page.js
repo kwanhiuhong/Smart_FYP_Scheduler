@@ -57,15 +57,33 @@ main_app.controller('scheduler_controller', function($scope, $http){
             //right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
         eventClick: function(info) {
-            let modalBtn = document.getElementById("modalButton");
-            let modalTitle = document.getElementById("modalTitle");
-            let modalBody = document.getElementById("modalBody");
+            // let modalBtn = document.getElementById("modalButton");
+            // let modalTitle = document.getElementById("modalTitle");
+            // let modalBody = document.getElementById("modalBody");
+            // let startTime = convertToGMTString(info.event._instance.range.start);
+            // let endTime = convertToGMTString(info.event._instance.range.end);
+
+            // modalTitle.innerHTML = "Info from: " + startTime + " to " + endTime;
+            // modalBody.innerHTML = info.event.title;
+            // modalBtn.click();
+
             let startTime = convertToGMTString(info.event._instance.range.start);
             let endTime = convertToGMTString(info.event._instance.range.end);
+            let eventInfo = "Are you sure to remove this slot from the calendar? - " + 
+                            startTime + " to " + endTime + ": " + info.event.title;
+            let rsp = confirm(eventInfo);
+            if (rsp == true){
+                let eventStartTimeIso = Date.parse(startTime);
+                $http.delete("/removeUnavailableSlot?startTime="+eventStartTimeIso).then(function(response){
+                    let rsp = response.data;
+                    if (rsp == "Success"){
+                        refreshCalendar();
+                    }
+                    let msg = msg_base_receive(rsp);
+                    displayMsgOnCommandBox(msg);
+                });
+            }
 
-            modalTitle.innerHTML = "Info from: " + startTime + " to " + endTime;
-            modalBody.innerHTML = info.event.title;
-            modalBtn.click();
         },
         eventMouseEnter: function(info){
             let element = info.el;
@@ -92,6 +110,7 @@ main_app.controller('scheduler_controller', function($scope, $http){
                         //     textColor: "Black"
                         // })
                         refreshCalendar();
+                        canSelectTable(true);
                     } else {
                         alert("Fail to add event to calendar, error: " + response.data);
                     } 
@@ -259,13 +278,13 @@ main_app.controller('scheduler_controller', function($scope, $http){
                 let sentMsg = msg_base_receive("You don't have confirmed slot, no need to reschedule :)");
                 displayMsgOnCommandBox(sentMsg);
             } else {
-                let ans = confirm("Rescheduling will remove all your records, are you sure to continue?");
+                let ans = confirm("Rescheduling will remove your group's confirmed slot, are you sure to continue?");
                 if (ans == true){
                     $http.delete("/removeConfirmedSlot").then(function(response){
                         if (response.data != "Success"){
                             alert(reponse.data);
                         } else {
-                            let msg = msg_base_receive("Deleted confirmed slot successfully");
+                            let msg = msg_base_receive("Removed confirmed slot successfully");
                             displayMsgOnCommandBox(msg);
                             refreshCalendar();
                             canSelectTable(true);
@@ -289,6 +308,7 @@ main_app.controller('scheduler_controller', function($scope, $http){
     function restartBot(){
         clearAllMsg();
         $scope.loadMsg();
+        canSelectTable(false);
     }
 });
 

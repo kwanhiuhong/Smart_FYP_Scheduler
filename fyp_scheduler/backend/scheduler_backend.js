@@ -185,7 +185,78 @@ router.delete('/removeConfirmedSlot', function(req, res, next){
 });
 
 router.delete('/removeUnavailableSlot', function(req, res, next){
+  let usrInfo = req.session.userInfo;
+  if(!usrInfo){
+    res.send("No login session found");
+  } else {
+    let slotStartTimeIsoStr = req.query.startTime;
+    let groupNo = usrInfo["username"];
+    let identity = usrInfo["type"];
+    let db = req.db;
+    let dbUnavailableTime = db.get("UnavailableTime");
+    dbUnavailableTime.find({"startTime": slotStartTimeIsoStr}, function(err, unavailableSlot){
 
+      if (err == null){
+        if (unavailableSlot.length > 0){
+          
+          for (let i = 0; i < unavailableSlot.length; ++i){
+            let records = unavailableSlot[i]["records"];
+            let hasUpdate = false;
+            let hasOtherIdentityRecord = false;
+            let otherIdentity = "";
+
+            for (let j = 0; j < records.length; ++j){
+              let eachRecordUsrname = records[j]["username"];
+              let eachRecordIdentity = records[j]["usertype"];
+              
+              if (eachRecordUsrname == groupNo && eachRecordIdentity == identity){
+                hasUpdate = true;
+                records.splice(j, 1);
+                j--;
+              } else if (eachRecordUsrname == groupNo) {
+                hasOtherIdentityRecord = true;
+                otherIdentity = eachRecordIdentity;
+              }
+            }  
+
+            if (hasUpdate && records.length == 0){
+              //delete
+              dbUnavailableTime.remove({"startTime": slotStartTimeIsoStr}, function (err) {
+                if (err == null){
+                  res.send("Success");
+                } else {
+                  console.log("Failed to delete unavailable time");
+                  console.log(err);
+                  res.send(err);
+                }
+              });
+            } else if (hasUpdate && records.length > 0) {
+              //update
+              dbUnavailableTime.update({'startTime': slotStartTimeIsoStr}, {$set: {"records": records}}, function(err){
+                if (err == null) {
+                  res.send("Success");
+                } else {
+                  console.log("Failed to update unavailable time");
+                  console.log(err);
+                  res.send(err);
+                }
+              });
+            } else if (hasOtherIdentityRecord == true){
+              res.send("You are NOT allowed to change your group's " + otherIdentity + " unavailable slot :)");
+            } else {
+              res.send("No unavailable slot of your group removed :)");
+            }
+          }
+        } else {
+          res.send("You are NOT allowed to remove other groups' slot nor confirmed slot :)");
+        }
+      } else {
+        console.log("Error when removing unavailable slot, see:");
+        console.log(err);
+        res.send(err);
+      }
+    });
+  }
 });
 
 router.put('/confirmATimeslot', bodyParser.json(), function(req, res, next){
