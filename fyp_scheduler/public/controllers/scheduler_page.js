@@ -234,26 +234,28 @@ main_app.controller('scheduler_controller', function($scope, $http){
         }
     }
 
-    $scope.retrieveCmd = function(){
-        let cmd = retrieveMsg();
-        displayMsgOnCommandBox(msg_base_send(cmd));
-        switch (cmd) {
-            case "1" || 1:
-                selectUnavailableSlots();
-                break;
-            case "2" || 2:
-                reschedule();
-                break;
-            case "3" || 3:
-                confirmADate();
-                break;
-            case "4" || 4:
-                restartBot();
-                break;
-            default:
-                let sentMsg = msg_base_receive("Please input the right command 1/2/3/4!");
-                displayMsgOnCommandBox(sentMsg);
-          }
+    $scope.retrieveCmd = function(event = null){
+        if (event == null || event.keyCode == 13){
+            let cmd = retrieveMsg();
+            displayMsgOnCommandBox(msg_base_send(cmd));
+            switch (cmd) {
+                case "1" || 1:
+                    selectUnavailableSlots();
+                    break;
+                case "2" || 2:
+                    reschedule();
+                    break;
+                case "3" || 3:
+                    confirmADate();
+                    break;
+                case "4" || 4:
+                    restartBot();
+                    break;
+                default:
+                    let sentMsg = msg_base_receive("Please input the right command 1/2/3/4!");
+                    displayMsgOnCommandBox(sentMsg);
+            }
+        }
     }
 
     function selectUnavailableSlots(){
