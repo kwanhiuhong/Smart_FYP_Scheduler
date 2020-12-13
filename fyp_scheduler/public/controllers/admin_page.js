@@ -172,7 +172,7 @@ function removeSpecialCharInKey(obj){
     for (let i = 0; i < allKeys.length; ++i){
         let key = allKeys[i];
         if (key.includes(specialChar)){
-            let newKey = key.replace(specialChar, "");
+            let newKey = key.replaceAll(specialChar, "");
             obj = changeKey(obj, key, newKey);
         }
     }

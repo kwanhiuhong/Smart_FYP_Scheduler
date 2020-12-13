@@ -20,23 +20,22 @@ Please download and install the relevant [MongoDB and NodeJS version](#Specifica
 1. First link your mongodb to this project data folder
 `/Users/hiuhongkwan/Documents/Developer_Tools/MongoDB_4.4.1/mongodb-macos-x86_64-4.4.1/bin/mongod --dbpath /Users/hiuhongkwan/Desktop/HKU_courses/Yr5-sem\ one/Comp4805-FYP/Smart_FYP_Scheduler/fyp_scheduler/data`
 
-2. Then call mongo to start manipulate the mongo db
+2. Then call mongo to start manipulating the mongo db
 `/Users/hiuhongkwan/Documents/Developer_Tools/MongoDB_4.4.1/mongodb-macos-x86_64-4.4.1/bin/mongo`
 
-3. Use the same terminal window on step 2, type in the following commands to create database and collections for this web app.
+3. Use the same terminal window at step 2, type in the following commands to create database and collections for this web app.
 `use fyp_sheduler`
 `db.createCollection()`
 
-4. Browse/cd to the directory where your app.js is located, in our case that would be:
-`/Users/hiuhongkwan/Desktop/HKU_courses/Yr5-sem\ one/Comp4805-FYP/Smart_FYP_Scheduler/fyp_scheduler`
-Type the following command in the terminal:
-`npm start`
-`db.createCollection("ConfirmedTime")`
-`db.createCollection("GroupInfo")`
-`db.createCollection("UnavailableTime")`
-`db.createCollection("User")`
-For more command MongoDB commands, pls refer to [here]
-(#Common-MongoDB-Commands)
+4. Browse/cd to the directory where your app.js is located, in our case that would be:<br>
+`/Users/hiuhongkwan/Desktop/HKU_courses/Yr5-sem\ one/Comp4805-FYP/Smart_FYP_Scheduler/fyp_scheduler`<br>
+Type the following command in the terminal:<br>
+`npm start`<br>
+`db.createCollection("ConfirmedTime")`<br>
+`db.createCollection("GroupInfo")`<br>
+`db.createCollection("UnavailableTime")`<br>
+`db.createCollection("User")`<br>
+For more command MongoDB commands, pls refer to [here](#Common-MongoDB-Commands)
 Note that we have 4 collections in total.
 ![](https://i.imgur.com/LvLcHNR.png)
 
@@ -108,11 +107,11 @@ Admin Page
 ---
 Once enter this page for the first time, you should expect no data on this page
 ![](https://i.imgur.com/irYPloQ.png)
-To import data, you either down a template and input the data by your self, or use our sample data which is located at "Smart_FYP_Scheduler/fyp_scheduler/public/data_source/"
+To import data, you either download a template and input the data by your self, or use our sample data which is located at "Smart_FYP_Scheduler/fyp_scheduler/public/data_source/"
 After that you shall expect to see Group No and password attached to your data like the following:
 ![](https://i.imgur.com/tpIQwTX.png)
 
 Scheduler Page
 ---
-Use the group number and password generated above to enter this scheduler page. Then you can follow the command Box to start to select unavailable time slots and schedule/reschedule a timeslot.
+Use the group number and password generated above to enter this scheduler page. Then you can follow the command Box to start picking unavailable timeslots and schedule/reschedule a new timeslot.
 ![](https://i.imgur.com/ZZSq4NP.png)
