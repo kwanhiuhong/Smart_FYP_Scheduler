@@ -2,8 +2,6 @@ Smart FYP Scheduler
 ===
 ## Table of Contents
 
-* [Smart FYP Scheduler](#smart-fyp-scheduler)
-   * [Table of Contents](#table-of-contents)
 * [Setup](#setup)
 * [Common MongoDB Commands](#common-mongodb-commands)
     * [Databases](#databases)
@@ -63,13 +61,13 @@ Common MongoDB Commands
  
 Specification
 ===
-MongoDB version: 4.4.1
-NodeJS version: v12.18.4
-AugularJS: 1.8.0
+1. MongoDB version: 4.4.1
+2. NodeJS version: v12.18.4
+3. AugularJS: 1.8.0
 (https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.min.js)
-ExpressJS: 4.16.1
-Bootstrap: 4.5.2
-Font Awesome Icons: 4.7.0
+4. ExpressJS: 4.16.1
+5. Bootstrap: 4.5.2
+6. Font Awesome Icons: 4.7.0
 
 Documentations
 ===
