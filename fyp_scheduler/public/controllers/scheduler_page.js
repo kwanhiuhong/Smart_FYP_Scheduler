@@ -77,7 +77,11 @@ main_app.controller('scheduler_controller', function($scope, $http){
                 $http.delete("/removeUnavailableSlot?startTime="+eventStartTimeIso).then(function(response){
                     let rsp = response.data;
                     if (rsp == "Success"){
+                        let isSelectable = calendar.currentData.options.selectable;
                         refreshCalendar();
+                        if (isSelectable == true){
+                            canSelectTable(true);
+                        }
                     }
                     let msg = msg_base_receive(rsp);
                     displayMsgOnCommandBox(msg);
