@@ -112,6 +112,7 @@ Once enter this page for the first time, you should expect no data on this page
 To import data, you either download a template and input the data by your self, or use our sample data which is located at "Smart_FYP_Scheduler/fyp_scheduler/public/data_source/"
 After that you shall expect to see Group No and password attached to your data like the following:
 ![](https://i.imgur.com/tpIQwTX.png)
+P.S: Our data comes from https://intranet.cs.hku.hk/csintranet/contents/fyp/fyp_details.jsp?acadYear=2020
 
 Scheduler Page
 ---
