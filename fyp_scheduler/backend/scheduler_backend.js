@@ -244,7 +244,7 @@ router.delete('/removeUnavailableSlot', function(req, res, next){
             } else if (hasOtherIdentityRecord == true){
               res.send("You are NOT allowed to change your group's " + otherIdentity + " unavailable slot :)");
             } else {
-              res.send("No unavailable slot of your group removed :)");
+              res.send("You are NOT allowed to remove other groups' slot nor confirmed slot :)");
             }
           }
         } else {
