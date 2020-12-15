@@ -25,12 +25,6 @@ Please download and install the relevant [MongoDB and NodeJS version](#Specifica
 
 3. Use the same terminal window at step 2, type in the following commands to create database and collections for this web app.
 `use fyp_sheduler`
-`db.createCollection()`
-
-4. Browse/cd to the directory where your app.js is located, in our case that would be:<br>
-`/Users/hiuhongkwan/Desktop/HKU_courses/Yr5-sem\ one/Comp4805-FYP/Smart_FYP_Scheduler/fyp_scheduler`<br>
-Type the following command in the terminal:<br>
-`npm start`<br>
 `db.createCollection("ConfirmedTime")`<br>
 `db.createCollection("GroupInfo")`<br>
 `db.createCollection("UnavailableTime")`<br>
@@ -40,6 +34,11 @@ Note that we have 4 collections in total.
 (You need this to login into the admin page)
 For other common usedly MongoDB commands, pls refer to [here](#Common-MongoDB-Commands)
 ![](https://i.imgur.com/LvLcHNR.png)
+
+4. Browse/cd to the directory where your app.js is located, in our case that would be:<br>
+`/Users/hiuhongkwan/Desktop/HKU_courses/Yr5-sem\ one/Comp4805-FYP/Smart_FYP_Scheduler/fyp_scheduler`<br>
+Type the following command in the terminal:<br>
+`npm start`<br>
 
 5. Open a web browser and type in "https://localhost:3000" to start the web app.
 
@@ -112,6 +111,7 @@ Once enter this page for the first time, you should expect no data on this page
 To import data, you either download a template and input the data by your self, or use our sample data which is located at "Smart_FYP_Scheduler/fyp_scheduler/public/data_source/"
 After that you shall expect to see Group No and password attached to your data like the following:
 ![](https://i.imgur.com/tpIQwTX.png)
+<br>
 P.S: Our data comes from https://intranet.cs.hku.hk/csintranet/contents/fyp/fyp_details.jsp?acadYear=2020
 
 Scheduler Page
