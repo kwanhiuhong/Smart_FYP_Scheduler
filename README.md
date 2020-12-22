@@ -32,8 +32,8 @@ Please download and install the relevant [MongoDB and NodeJS version](#Specifica
 Note that we have 4 collections in total.<br>
 `db.User.insert({"username" : "admin", "password" : "admin", "type" : "admin"})`<br>
 (You need this to login into the admin page)<br>
-For other common usedly MongoDB commands, pls refer to [here](#Common-MongoDB-Commands)
-![](https://i.imgur.com/LvLcHNR.png)
+For other commonly used MongoDB commands, pls refer to [here](#Common-MongoDB-Commands)
+<br>![](https://i.imgur.com/LvLcHNR.png)
 
 4. Browse/cd to the directory where your app.js is located, in our case that would be:<br>
 `/Users/hiuhongkwan/Desktop/HKU_courses/Yr5-sem\ one/Comp4805-FYP/Smart_FYP_Scheduler/fyp_scheduler`<br>
