@@ -6,6 +6,7 @@ var schedulerConfigs = {
     initDate: new Date(2020, 10, 30, 9, 30, 0),
     totalLength: 12,
     maxNoOfGrpsInEachSlot: 2,
+    location: ["Rm 202 HWB", "Rm 203 HWB"],
     startDayTime: '09:30:00',
     endDayTime: '18:30:00',
     maxPresentationTime: '00:20:00',
@@ -395,7 +396,7 @@ function eventCreator(timeslots, color, textColor, extraText = ""){
                 let usertype = eachRecord["usertype"];
                 let reason = eachRecord["reasons"];
                 if(usertype == undefined || reason == undefined){
-                    content += extraText + "Group " + username + " will present\n";
+                    content += extraText + "Group " + username + " will present in " + schedulerConfigs.location[j] + "\n";
                 } else {
                     content += extraText + "Group " + username + "'s " + usertype + ": " + reason + "\n";
                 }

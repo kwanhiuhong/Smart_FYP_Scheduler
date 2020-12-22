@@ -23,15 +23,15 @@ Please download and install the relevant [MongoDB and NodeJS version](#Specifica
 2. Then call mongo to start manipulating the mongo db
 `/Users/hiuhongkwan/Documents/Developer_Tools/MongoDB_4.4.1/mongodb-macos-x86_64-4.4.1/bin/mongo`
 
-3. Use the same terminal window at step 2, type in the following commands to create database and collections for this web app.
-`use fyp_sheduler`
+3. Use the same terminal window at step 2, type in the following commands to create database and collections for this web app.<br>
+`use fyp_sheduler`<br>
 `db.createCollection("ConfirmedTime")`<br>
 `db.createCollection("GroupInfo")`<br>
 `db.createCollection("UnavailableTime")`<br>
 `db.createCollection("User")`<br>
-Note that we have 4 collections in total.
+Note that we have 4 collections in total.<br>
 `db.User.insert({"username" : "admin", "password" : "admin", "type" : "admin"})`<br>
-(You need this to login into the admin page)
+(You need this to login into the admin page)<br>
 For other common usedly MongoDB commands, pls refer to [here](#Common-MongoDB-Commands)
 ![](https://i.imgur.com/LvLcHNR.png)
 
@@ -108,7 +108,7 @@ Admin Page
 ---
 Once enter this page for the first time, you should expect no data on this page
 ![](https://i.imgur.com/irYPloQ.png)
-To import data, you either download a template and input the data by your self, or use our sample data which is located at "Smart_FYP_Scheduler/fyp_scheduler/public/data_source/"
+To import data, you either download a template and input the data by your self, or use our sample data which is located at "Smart_FYP_Scheduler/fyp_scheduler/public/data_source/"<br>
 After that you shall expect to see Group No and password attached to your data like the following:
 ![](https://i.imgur.com/tpIQwTX.png)
 <br>
