@@ -121,8 +121,8 @@ Use the group number and password generated above to enter this scheduler page. 
 <br>
 
 You can select the timeslot you want by inputting "1" in the chatbox
-![](https://github.com/kwanhiuhong/Smart_FYP_Scheduler/tree/master/demo/Select_time_slot.png)
+![](https://github.com/kwanhiuhong/Smart_FYP_Scheduler/blob/master/demo/Select_time_slot.png)
 <br>
 
 Or you can remove the timeslot you scheduled and reschedule a new time slot if you wish
-![](https://github.com/kwanhiuhong/Smart_FYP_Scheduler/tree/master/demo/Remove_time_slot.png)
+![](https://github.com/kwanhiuhong/Smart_FYP_Scheduler/blob/master/demo/Remove_time_slot.png)
